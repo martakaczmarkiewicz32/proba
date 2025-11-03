@@ -2,6 +2,13 @@
 # Autor: Analiza danych studentów
 # Data: 2025-11-03
 
+# Wczytanie potrzebnych bibliotek
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+library(psych)
+library(dplyr)
+
 # Wczytanie pliku CSV
 dane <- read.csv("Students Social Media Addiction.csv", 
                  header = TRUE, 
@@ -178,5 +185,80 @@ cat("Liczba zmiennych:", ncol(dane), "\n\n")
 summary(dane)
 sink()
 
+# Dodatkowe zaawansowane analizy
+
+# Wykres korelacji przy użyciu corrplot
+png("korelacje_zaawansowane.png", width = 800, height = 800)
+corrplot(cor_matrix, 
+         method = "color", 
+         type = "upper", 
+         order = "hclust",
+         addCoef.col = "black",
+         tl.col = "black", 
+         tl.srt = 45,
+         title = "Macierz korelacji zmiennych numerycznych")
+dev.off()
+
+# Zaawansowane wykresy ggplot2
+
+# 1. Relacja między czasem spędzonym na mediach a zdrowiem psychicznym
+ggplot(dane, aes(x = Avg_Daily_Usage_Hours, y = Mental_Health_Score)) +
+  geom_point(aes(color = Gender), alpha = 0.6) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Zależność między czasem użytkowania a zdrowiem psychicznym",
+       x = "Średni dzienny czas użytkowania (godz.)",
+       y = "Wynik zdrowia psychicznego") +
+  theme_minimal()
+ggsave("zdrowie_vs_uzytkowanie.png")
+
+# 2. Rozkład wyników uzależnienia według platformy
+ggplot(dane, aes(x = Most_Used_Platform, y = Addicted_Score)) +
+  geom_boxplot(aes(fill = Most_Used_Platform)) +
+  labs(title = "Rozkład wyników uzależnienia według platformy",
+       x = "Platforma",
+       y = "Wynik uzależnienia") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave("uzaleznienie_vs_platforma.png")
+
+# 3. Analiza godzin snu względem użytkowania
+ggplot(dane, aes(x = Avg_Daily_Usage_Hours, y = Sleep_Hours_Per_Night)) +
+  geom_point(aes(color = Academic_Level), alpha = 0.6) +
+  geom_smooth(method = "loess", se = TRUE) +
+  labs(title = "Wpływ użytkowania mediów na sen",
+       x = "Średni dzienny czas użytkowania (godz.)",
+       y = "Godziny snu") +
+  theme_minimal()
+ggsave("sen_vs_uzytkowanie.png")
+
+# Testy statystyczne
+
+# 1. Test różnic w uzależnieniu między płciami
+test_plec <- t.test(Addicted_Score ~ Gender, data = dane)
+cat("\n=== TEST T DLA RÓŻNIC W UZALEŻNIENIU MIĘDZY PŁCIAMI ===\n")
+print(test_plec)
+
+# 2. ANOVA dla różnic w czasie użytkowania między poziomami akademickimi
+model_anova <- aov(Avg_Daily_Usage_Hours ~ Academic_Level, data = dane)
+cat("\n=== ANOVA DLA RÓŻNIC W CZASIE UŻYTKOWANIA ===\n")
+print(summary(model_anova))
+
+# 3. Korelacja między czasem użytkowania a zdrowiem psychicznym
+test_cor <- cor.test(dane$Avg_Daily_Usage_Hours, dane$Mental_Health_Score)
+cat("\n=== TEST KORELACJI: CZAS UŻYTKOWANIA VS ZDROWIE PSYCHICZNE ===\n")
+print(test_cor)
+
+# Podsumowanie końcowe
+cat("\n=== GŁÓWNE WNIOSKI ===\n")
+cat("1. Średni czas użytkowania mediów społecznościowych:", round(mean(dane$Avg_Daily_Usage_Hours, na.rm = TRUE), 2), "godzin dziennie\n")
+cat("2. Najczęściej używana platforma:", names(which.max(table(dane$Most_Used_Platform))), "\n")
+cat("3. Średni wynik zdrowia psychicznego:", round(mean(dane$Mental_Health_Score, na.rm = TRUE), 2), "\n")
+cat("4. Korelacja między czasem użytkowania a zdrowiem psychicznym:", round(cor(dane$Avg_Daily_Usage_Hours, dane$Mental_Health_Score, use = "complete.obs"), 3), "\n")
+
 cat("\n=== ANALIZA ZAKOŃCZONA ===\n")
 cat("Wyniki zapisane do pliku: podsumowanie_analizy.txt\n")
+cat("Dodatkowo utworzono wykresy:\n")
+cat("- korelacje_zaawansowane.png\n")
+cat("- zdrowie_vs_uzytkowanie.png\n")
+cat("- uzaleznienie_vs_platforma.png\n")
+cat("- sen_vs_uzytkowanie.png\n")
