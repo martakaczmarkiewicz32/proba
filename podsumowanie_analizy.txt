@@ -1,3 +1,27 @@
 RAPORT Z ANALIZY PODSTAWOWEJ
-Data: 2025-11-10 
+Data: 2025-11-30 
 
+Liczba obserwacji: 705 
+Liczba zmiennych: 13 
+
+   Student_ID       Age           Gender          Academic_Level       Country         
+ Min.   :  1   Min.   :18.00   Length:705         Length:705         Length:705        
+ 1st Qu.:177   1st Qu.:19.00   Class :character   Class :character   Class :character  
+ Median :353   Median :21.00   Mode  :character   Mode  :character   Mode  :character  
+ Mean   :353   Mean   :20.66                                                           
+ 3rd Qu.:529   3rd Qu.:22.00                                                           
+ Max.   :705   Max.   :24.00                                                           
+ Avg_Daily_Usage_Hours Most_Used_Platform Affects_Academic_Performance Sleep_Hours_Per_Night
+ Min.   :1.500         Length:705         Length:705                   Min.   :3.800        
+ 1st Qu.:4.100         Class :character   Class :character             1st Qu.:6.000        
+ Median :4.800         Mode  :character   Mode  :character             Median :6.900        
+ Mean   :4.919                                                         Mean   :6.869        
+ 3rd Qu.:5.800                                                         3rd Qu.:7.700        
+ Max.   :8.500                                                         Max.   :9.600        
+ Mental_Health_Score Relationship_Status Conflicts_Over_Social_Media Addicted_Score 
+ Min.   :4.000       Length:705          Min.   :0.00                Min.   :2.000  
+ 1st Qu.:5.000       Class :character    1st Qu.:2.00                1st Qu.:5.000  
+ Median :6.000       Mode  :character    Median :3.00                Median :7.000  
+ Mean   :6.227                           Mean   :2.85                Mean   :6.437  
+ 3rd Qu.:7.000                           3rd Qu.:4.00                3rd Qu.:8.000  
+ Max.   :9.000                           Max.   :5.00                Max.   :9.000  
