@@ -4,8 +4,9 @@ install.packages("scales")
 library("scales")
 library(tidyverse)
 library(ggplot2)
+dane <- read.csv("Students Social Media Addiction.csv")
 
-usage_plot <- ggplot(data = Students_Social_Media_Addiction, aes(x = Avg_Daily_Usage_Hours)) +
+usage_plot <- ggplot(data = dane, aes(x = Avg_Daily_Usage_Hours)) +
   
   geom_histogram(
     aes(y = after_stat(density)), 
@@ -31,7 +32,7 @@ usage_plot <- ggplot(data = Students_Social_Media_Addiction, aes(x = Avg_Daily_U
 print(usage_plot)
 
 
-platform_plot <- ggplot(data = Students_Social_Media_Addiction, aes(y = fct_infreq(Most_Used_Platform))) + 
+platform_plot <- ggplot(data = dane, aes(y = fct_infreq(Most_Used_Platform))) + 
   
   geom_bar(
     fill = "#E7298A", 
@@ -58,7 +59,7 @@ platform_plot <- ggplot(data = Students_Social_Media_Addiction, aes(y = fct_infr
 print(platform_plot)
 
 scatter_plot <- ggplot(
-  data = Students_Social_Media_Addiction, 
+  data = dane, 
   aes(x = Avg_Daily_Usage_Hours, y = Addicted_Score)
 ) +
   
@@ -98,7 +99,7 @@ scatter_plot <- ggplot(
 print(scatter_plot)
 
 #Porównanie Poziomów Akademickich
-level_gender_plot <- ggplot(data = Students_Social_Media_Addiction, aes(x = Academic_Level)) +
+level_gender_plot <- ggplot(data = dane, aes(x = Academic_Level)) +
   geom_bar(
     aes(fill = Gender),
     position = "dodge", 
@@ -118,7 +119,7 @@ print(level_gender_plot)
 
 
 #Związek Uzależnienia a Godziny Snu
-sleep_boxplot <- ggplot(data = Students_Social_Media_Addiction, aes(x = Affects_Academic_Performance, y = Sleep_Hours_Per_Night)) +
+sleep_boxplot <- ggplot(data = dane, aes(x = Affects_Academic_Performance, y = Sleep_Hours_Per_Night)) +
   
   geom_boxplot(
     aes(fill = Affects_Academic_Performance), 
@@ -146,7 +147,7 @@ print(sleep_boxplot)
 
 
 #Wizualizacja Wyniku Uzależnienia w Czasie Użytkowania
-heatmap_bin2d <- ggplot(data = Students_Social_Media_Addiction, aes(x = Avg_Daily_Usage_Hours, y = Addicted_Score)) +
+heatmap_bin2d <- ggplot(data = dane, aes(x = Avg_Daily_Usage_Hours, y = Addicted_Score)) +
   geom_bin2d(
     bins = 10
   ) +
@@ -162,3 +163,32 @@ heatmap_bin2d <- ggplot(data = Students_Social_Media_Addiction, aes(x = Avg_Dail
   theme_minimal()
 
 print(heatmap_bin2d)
+
+dane$Academic_Level <- factor(dane$Academic_Level, 
+                            levels = c("High School", "Undergraduate", "Graduate"))
+usage_addiction_plot <- ggplot(data = dane, aes(x = Academic_Level, y = Avg_Daily_Usage_Hours)) +
+  
+  geom_jitter(
+    aes(color = Addicted_Score, size = Addicted_Score),
+    alpha = 0.7,
+    width = 0.2
+  ) +
+  
+  scale_color_gradient(
+    low = "yellow", 
+    high = "red", 
+    name = "Poziom Uzależnienia\n(0-10)"
+  ) +
+  
+  scale_size_continuous(range = c(2, 6), guide = "none") +
+  
+  labs(
+    title = "Godziny Użytkowania i Poziom Uzależnienia w Podziale na Wykształcenie",
+    subtitle = "Kolor i rozmiar punktu odzwierciedlają wynik uzależnienia",
+    x = "Poziom Wykształcenia",
+    y = "Średnia Dzienna Liczba Godzin Użytkowania"
+  ) +
+  
+  theme_minimal() 
+
+print(usage_addiction_plot)
