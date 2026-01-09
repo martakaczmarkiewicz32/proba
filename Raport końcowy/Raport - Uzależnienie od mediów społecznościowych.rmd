@@ -1,0 +1,120 @@
+---
+---
+title: "Analiza Uzależnienia Studentów od Mediów Społecznościowych"
+author: "Marta Kaczmarkiewicz, Natalia Gaik, Michał Biesiadowski"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    theme: cosmo
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# 1. Wprowadzenie
+
+## 1.1 Cel i zakres analizy
+Celem niniejszego projektu jest zbadanie relacji między sposobem korzystania z mediów społecznościowych a subiektywnym dobrostanem studentów. 
+W dobie powszechnej cyfryzacji, zrozumienie cyfrowych nawyków młodych dorosłych staje się kluczowe dla identyfikacji potencjalnych ryzyk związanych z nadużywaniem 
+technologii. W badaniu koncentrujemy się na weryfikacji, czy czas spędzany online oraz rodzaj wybieranej platformy współwystępują z niższą oceną zdrowia psychicznego,
+gorszą jakością snu oraz poczuciem uzależnienia.
+
+## 1.2 Charakterystyka danych
+Analiza została przeprowadzona na zbiorze danych obejmującym 705 obserwacji. Dane mają charakter deklaratywny i zostały zebrane metodą ankietową. 
+Zmienne wykorzystane w badaniu obejmują:
+
+Zmienne demograficzne: Wiek, płeć, poziom studiów.
+
+Zmienne behawioralne:
+
+Avg_Daily_Usage_Hours (Czas_h): Średnia liczba godzin spędzanych dziennie w mediach społecznościowych.
+
+Most_Used_Platform (Platforma): Najczęściej wybierana aplikacja społecznościowa.
+
+Conflicts_Over_Social_Media (Konflikty): Liczba sytuacji konfliktowych z otoczeniem, których źródłem było korzystanie z mediów społecznościowych.
+
+Zmienne dobrostanu:
+
+Mental_Health_Score (Zdrowie_psychiczne): Subiektywna ocena własnego zdrowia psychicznego w skali 1-10 (gdzie 10 oznacza samopoczucie doskonałe).
+
+Addicted_Score (Wynik_uzaleznienia): Subiektywna ocena stopnia uzależnienia od mediów w skali 1-5.
+
+Sleep_Hours_Per_Night (Godziny_snu): Deklarowana średnia długość snu.
+
+
+**Pytania badawcze:**
+
+
+
+## 1.3 Przygotowanie środowiska
+Do przetwarzania i wizualizacji danych wykorzystano środowisko R oraz następujących bibliotek:
+```{r wczytanie-bibliotek}
+# Ładowanie niezbędnych pakietów
+if.needed <- function(pkg){
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+if.needed("tidyverse")
+if.needed("corrplot")
+if.needed("knitr")
+if.needed("kableExtra")
+if.needed("ggthemes")
+
+# Ustawienie estetyki wykresów
+theme_set(theme_minimal())
+```
+```{r wczytanie-danych}
+# Wczytanie danych
+dane <- read_csv("Students Social Media Addiction.csv")
+
+# Podstawowy przegląd
+glimpse(dane)
+```
+# 2. Przygotowanie danych (Data Wrangling)
+Przed przystąpieniem do analizy statystycznej, dane zostały uporządkowane i dostosowane do wymogów raportu. Proces ten obejmował zmianę nazewnictwa zmiennych 
+na język polski, co ułatwia interpretację wyników, oraz konwersję zmiennych tekstowych na typ kategoryczny. W ramach inżynierii cech (feature engineering)
+utworzono dodatkowe wskaźniki, takie jak podział użytkowników na grupy ze względu na intensywność korzystania z sieci.
+```{r missing-values}
+# Funkcja summary() pokazująca liczbę NA dla każdej kolumny
+summary(dane)
+
+#dokładne zliczenie braków w kolumnach
+braki_tabela <- dane %>%
+  summarise_all(~sum(is.na(.))) %>%
+  gather(key = "Zmienna", value = "Liczba_Brakow") %>%
+  arrange(desc(Liczba_Brakow))
+
+# Wyświetlenie tabeli braków
+braki_tabela %>%
+  kbl(caption = "Liczba brakujących wartości w zmiennych") %>%
+  kable_styling(full_width = F)
+```
+
+ops braku brakow
+
+
+## 2.2 Sprawdzenie spójności danych
+```{r data-validation}
+
+```
+
+## 2.3 Transformacja i czyszczenie
+```{r data-cleaning}
+
+```
+# 3. Analiza Opisowa
+
+
+# 4. Wizualizacja Danych
+
+
+# 5. Wnioskowanie Statystyczne
+
+
+# 6. Podsumowanie i Wnioski
+
