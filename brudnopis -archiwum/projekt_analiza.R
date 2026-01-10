@@ -9,7 +9,7 @@
 library(tidyverse)
 
 # Wczytanie danych
-dane <- read_csv("c:/Users/biesi/Desktop/studia/analiza danych w R/proba/Students Social Media Addiction.csv")
+dane <- read_csv("~/Desktop/Analiza Danych w R/Students Social Media Addiction.csv")
 
 # Podstawowe informacje o danych
 glimpse(dane)
@@ -237,3 +237,122 @@ ggplot(dane_clean, aes(x = Najpopularniejsza_platforma, fill = Plec)) +
     y = "Liczba studentów",
     fill = "Płeć") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#Heatmapa: średni wynik uzależnienia wg platformy i poziomu akademickiego
+tab_heat <- dane_clean %>%
+  group_by(Najpopularniejsza_platforma, Poziom_akademicki) %>%
+  summarise(sredni_wynik = mean(Wynik_uzaleznienia, na.rm = TRUE),
+            n = n(),
+            .groups = "drop") %>%
+  filter(n >= 5)  
+
+ggplot(tab_heat, aes(x = Poziom_akademicki, y = Najpopularniejsza_platforma, fill = sredni_wynik)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = round(sredni_wynik, 1)), size = 3) +
+  labs(title = "Heatmapa: średni wynik uzależnienia wg platformy i poziomu akademickiego",
+       x = "Poziom akademicki",
+       y = "Platforma",
+       fill = "Średni wynik") +
+  theme_minimal()
+
+#Czas korzystania z mediów społecznościowych a poziom uzależnienia według płci
+ggplot(dane_clean, aes(
+  x = Sredni_czas_uzywania_h,
+  y = Wynik_uzaleznienia,
+  color = Plec
+)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "Czas korzystania z mediów społecznościowych a poziom uzależnienia według płci",
+    x = "Średni czas używania (h)",
+    y = "Wynik uzależnienia",
+    color = "Płeć"
+  ) +
+  theme_minimal()
+
+#Sen a zdrowie psychiczne z mapowaniem poziomu uzależnienia
+ggplot(dane_clean, aes(
+  x = Godziny_snu,
+  y = Ocena_zdrowia_psychicznego,
+  color = poziom_uzaleznienia
+)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "Zależność długości snu i zdrowia psychicznego wg poziomu uzależnienia",
+    x = "Godziny snu na dobę",
+    y = "Ocena zdrowia psychicznego",
+    color = "Poziom uzależnienia"
+  ) +
+  theme_minimal()
+
+#"Rozkład długości snu w zależności od poziomu uzależnienia
+ggplot(dane_clean, aes(
+  x = Godziny_snu,
+  fill = poziom_uzaleznienia
+)) +
+  geom_density(alpha = 0.45) +
+  labs(
+    title = "Rozkład długości snu w zależności od poziomu uzależnienia",
+    x = "Godziny snu",
+    y = "Gęstość",
+    fill = "Poziom uzależnienia"
+  ) +
+  theme_minimal()
+
+#Rozkład poziomu uzależnienia w zależności od platformy
+ggplot(dane_clean, aes(
+  x = Najpopularniejsza_platforma,
+  y = Wynik_uzaleznienia,
+  fill = Najpopularniejsza_platforma
+)) +
+  geom_violin(alpha = 0.7, trim = FALSE) +
+  geom_boxplot(width = 0.15, color = "black", alpha = 0.6) +
+  labs(
+    title = "Rozkład poziomu uzależnienia w zależności od platformy",
+    x = "Platforma",
+    y = "Wynik uzależnienia"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+#Rozkład długości snu wśród studentów z wysokim uzależnieniem
+ggplot(dane_clean %>% filter(Wynik_uzaleznienia >= 7),
+       aes(x = Godziny_snu)) +
+  geom_histogram(binwidth = 0.5, fill = "#c0392b", color = "black") +
+  labs(
+    title = "Rozkład długości snu wśród studentów z wysokim uzależnieniem",
+    x = "Godziny snu",
+    y = "Liczba studentów"
+  ) +
+  theme_minimal()
+
+#Średni poziom uzależnienia wg kraju
+dane_clean %>%
+  group_by(Kraj) %>%
+  summarise(
+    sredni_wynik = mean(Wynik_uzaleznienia),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = reorder(Kraj, sredni_wynik), y = sredni_wynik)) +
+  geom_col(fill = "steelblue", width = 0.7) +
+  geom_hline(
+    yintercept = median(dane_clean$Wynik_uzaleznienia),
+    linetype = "dashed",
+    linewidth = 1
+  ) +
+  coord_flip() +
+  labs(
+    title = "Średni poziom uzależnienia wg kraju",
+    subtitle = "Linia przerywana to mediana",
+    x = "Kraj",
+    y = "Średni wynik uzależnienia"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
