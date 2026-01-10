@@ -75,41 +75,280 @@ dane <- read_csv("Students Social Media Addiction.csv")
 # Podstawowy przegląd
 glimpse(dane)
 ```
-# 2. Przygotowanie danych (Data Wrangling)
-Przed przystąpieniem do analizy statystycznej, dane zostały uporządkowane i dostosowane do wymogów raportu. Proces ten obejmował zmianę nazewnictwa zmiennych 
-na język polski, co ułatwia interpretację wyników, oraz konwersję zmiennych tekstowych na typ kategoryczny. W ramach inżynierii cech (feature engineering)
-utworzono dodatkowe wskaźniki, takie jak podział użytkowników na grupy ze względu na intensywność korzystania z sieci.
-```{r missing-values}
-# Funkcja summary() pokazująca liczbę NA dla każdej kolumny
-summary(dane)
 
-#dokładne zliczenie braków w kolumnach
-braki_tabela <- dane %>%
-  summarise_all(~sum(is.na(.))) %>%
-  gather(key = "Zmienna", value = "Liczba_Brakow") %>%
-  arrange(desc(Liczba_Brakow))
+# 2. Przygotowanie danych
+
+## 2.1 Sprawdzenie kompletności danych
+```{r missing-values}
+# Sprawdzenie brakujących wartości w każdej kolumnie
+braki <- dane %>%
+  summarise(across(everything(), ~sum(is.na(.))))
 
 # Wyświetlenie tabeli braków
-braki_tabela %>%
-  kbl(caption = "Liczba brakujących wartości w zmiennych") %>%
+braki %>%
+  kbl(caption = "Liczba braków danych w poszczególnych kolumnach") %>%
   kable_styling(full_width = F)
+
+# Całkowita liczba braków w zbiorze
+suma_brakow <- sum(is.na(dane))
+procent_brakow <- (suma_brakow / (nrow(dane) * ncol(dane))) * 100
 ```
 
 ops braku brakow
 
 
-## 2.2 Sprawdzenie spójności danych
+## 2.2 Walidacja wartości zmiennych
 ```{r data-validation}
+# Sprawdzenie, czy występują wartości naruszające logiczne reguły
+logiczne_naruszenia <- dane %>%
+  filter(
+    Age < 15 | Age > 30 |
+    Avg_Daily_Usage_Hours < 0 | Avg_Daily_Usage_Hours > 16 |
+    Sleep_Hours_Per_Night < 0 | Sleep_Hours_Per_Night > 14 |
+    Mental_Health_Score < 1 | Mental_Health_Score > 10 |
+    Addicted_Score < 1 | Addicted_Score > 10
+  )
 
+liczba_bledow <- nrow(logiczne_naruszenia)
 ```
 
-## 2.3 Transformacja i czyszczenie
+## 2.3 Transformacja i tłumaczenie
 ```{r data-cleaning}
+dane_clean <- dane %>%
+  rename(
+    ID = Student_ID,
+    Wiek = Age,
+    Plec = Gender,
+    Poziom_akademicki = Academic_Level,
+    Kraj = Country,
+    Sredni_Czas_Użytkowania = Avg_Daily_Usage_Hours,
+    Najczęściej_używana_platforma = Most_Used_Platform,
+    Wplyw_na_wyniki = Affects_Academic_Performance,
+    Godziny_snu = Sleep_Hours_Per_Night,
+    Ocena_zdrowia_psychicznego = Mental_Health_Score,
+    Konflikty_w_social_mediach = Conflicts_Over_Social_Media,
+    Wynik_uzaleznienia = Addicted_Score
+  ) %>%
+  mutate(
+    # Konwersja na faktory
+    f.Plec = as.factor(Plec),
+    f.Platforma = as.factor(Najczęściej_używana_platforma), # Poprawione odwołanie do nowej nazwy
+    f.Wplyw_na_wyniki = as.factor(Wplyw_na_wyniki),
+    
+    # Grupy użytkowników (Feature Engineering)
+    Grupa_Czasu_Uzytkowania = case_when(
+      Sredni_Czas_Użytkowania <= 2 ~ "Niski (0-2h)", # Poprawione odwołanie do nowej nazwy
+      Sredni_Czas_Użytkowania <= 5 ~ "Średni (2-5h)",
+      TRUE ~ "Wysoki (>5h)"
+    ),
+    f.Grupa_Czasu_Uzytkowania = factor(Grupa_Czasu_Uzytkowania, 
+                                       levels = c("Niski (0-2h)", "Średni (2-5h)", "Wysoki (>5h)")),
+    
+    # Deficyt snu
+    Deficyt_snu = 7 - Godziny_snu
+  )
 
+# Podgląd przetworzonych danych
+head(dane_clean) %>%
+  kbl(caption = "Fragment przetworzonego zbioru danych") %>%
+  kable_styling()
 ```
 # 3. Analiza Opisowa
 
+W rozdziale przedstawiono strukturę próby i rozkłady podstawowych zmiennych. Materiał ma charakter eksploracyjny
+służy identyfikacji wstępnych wzorców przed analizami wnioskowania.
 
+## 3.1 Charakterystyka próby
+
+
+### 3.1.1 Struktura demograficzna
+```{r demografia-tabela}
+# Tabela liczebności i procentów dla zmiennych demograficznych
+demografia <- dane_clean %>%
+  select(Plec, Poziom_akademicki, Kraj) %>%
+  gather(key = "Zmienna", value = "Kategoria") %>%
+  count(Zmienna, Kategoria) %>%
+  group_by(Zmienna) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  arrange(Zmienna, desc(n))
+
+print(demografia)
+```
+
+### 3.1.2 Podstawowe statystyki zmiennych ciągłych
+```{r statystyki-opisowe} 
+# Wybór zmiennych numerycznych i obliczenie statystyk
+dane_clean %>%
+  select(Wiek, Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, Wynik_uzaleznienia) %>%
+  summary()
+```
+
+## 3.2 Analiza czasu użytkowania mediów społecznościowych
+
+
+### 3.2.1 Statystyki czasu użytkowania
+```{r czas-uzytkowania-statystyki}
+# Szczegółowe miary położenia dla czasu
+dane_clean %>%
+  summarise(
+    Srednia = mean(Sredni_Czas_Użytkowania),
+    Mediana = median(Sredni_Czas_Użytkowania),
+    Odchylenie_Std = sd(Sredni_Czas_Użytkowania),
+    Min = min(Sredni_Czas_Użytkowania),
+    Max = max(Sredni_Czas_Użytkowania),
+    Q1 = quantile(Sredni_Czas_Użytkowania, 0.25),
+    Q3 = quantile(Sredni_Czas_Użytkowania, 0.75)
+  )
+``` 
+
+### 3.2.2 Rozkład czasu według kategorii
+```{r czas-uzytkowania-rozkład}
+# Analiza stworzonych grup (Niski/Średni/Wysoki)
+dane_clean %>%
+  count(f.Grupa_Czasu_Uzytkowania) %>%
+  mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
+```
+### 3.2.3 Najpopularniejsze platformy
+```{r najpopularniejsze-platformy}
+# Ranking platform
+dane_clean %>%
+  count(Najczęściej_używana_platforma) %>%
+  arrange(desc(n)) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1))
+```
+
+## 3.3 Analiza poziomu uzależnienia
+
+
+### 3.3.1 Rozkład wyniku uzależnienia
+```{r rozklad-uzaleznienia}
+# Statystyki dla Wynik_uzaleznienia
+dane_clean %>%
+  summarise(
+    Srednia_Uzaleznienie = mean(Wynik_uzaleznienia),
+    Mediana = median(Wynik_uzaleznienia),
+    SD = sd(Wynik_uzaleznienia)
+  )
+```
+
+### 3.3.2 Poziomy uzależnienia według kategorii
+```{r kategorie-uzaleznienia}
+# Tworzymy proste kategorie uzależnienia do tabeli
+dane_clean %>%
+  mutate(Kat_Uzaleznienia = case_when(
+    Wynik_uzaleznienia <= 3 ~ "Niskie",
+    Wynik_uzaleznienia <= 7 ~ "Umiarkowane",
+    TRUE ~ "Wysokie"
+  )) %>%
+  count(Kat_Uzaleznienia) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1)) %>%
+  arrange(desc(n))
+```
+
+## 3.4 Analiza według płci
+
+
+```{r analiza-plec}
+# Porównanie kobiet i mężczyzn w kluczowych aspektach
+dane_clean %>%
+  group_by(f.Plec) %>%
+  summarise(
+    N = n(),
+    Sredni_Czas = mean(Sredni_Czas_Użytkowania),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia),
+    Srednie_Zdrowie = mean(Ocena_zdrowia_psychicznego)
+  )
+```
+
+## 3.5 Analiza według poziomu akademickiego
+
+
+```{r analiza-poziom-akademicki}
+# Czy studenci studiów magisterskich różnią się od licencjackich?
+dane_clean %>%
+  group_by(Poziom_akademicki) %>%
+  summarise(
+    Sredni_Czas = mean(Sredni_Czas_Użytkowania),
+    Sredni_Sen = mean(Godziny_snu),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
+  ) %>%
+  arrange(desc(Sredni_Czas))
+```
+
+## 3.6 Zdrowie psychiczne i sen
+
+
+### 3.6.1 Jakość zdrowia psychicznego
+```{r zdrowie-psychiczne}
+# Podsumowanie oceny zdrowia psychicznego
+dane_clean %>%
+  summarise(
+    Srednia = mean(Ocena_zdrowia_psychicznego),
+    Mediana = median(Ocena_zdrowia_psychicznego),
+    Najnizsza = min(Ocena_zdrowia_psychicznego),
+    Najwyzsza = max(Ocena_zdrowia_psychicznego)
+  )
+```
+
+### 3.6.2 Jakość snu
+```{r jakosc-snu}
+# Analiza snu i deficytów
+stats_snu <- dane_clean %>%
+  summarise(
+    Srednia_Godzin = mean(Godziny_snu),
+    Liczba_z_Deficytem = sum(Godziny_snu < 7), # Deficyt poniżej 7h
+    Procent_z_Deficytem = mean(Godziny_snu < 7) * 100
+  )
+
+print(stats_snu)
+```
+
+## 3.7 Wpływ na wyniki akademickie
+
+
+```{r wplyw-na-wyniki}
+# Jak studenci oceniają wpływ social mediów na swoje oceny?
+dane_clean %>%
+  group_by(f.Wplyw_na_wyniki) %>%
+  summarise(
+    Liczba = n(),
+    Sredni_Czas_Uzytkowania = mean(Sredni_Czas_Użytkowania),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
+  )
+```
+
+## 3.8 Konflikty związane z mediami społecznościowymi
+
+
+```{r konflikty}
+# Czy konflikty wiążą się z uzależnieniem?
+dane_clean %>%
+  group_by(Konflikty_w_social_mediach) %>%
+  summarise(
+    Sredni_Wynik_Uzaleznienia = mean(Wynik_uzaleznienia),
+    Licznosc = n()
+  )
+
+# Prosta korelacja
+kor_konflikty <- cor(dane_clean$Konflikty_w_social_mediach, dane_clean$Wynik_uzaleznienia)
+print(paste("Korelacja konfliktów z uzależnieniem wynosi:", round(kor_konflikty, 2)))
+```
+
+## 3.9 Korelacje między zmiennymi
+
+```{r korelacje-zmienne}
+# Wybór tylko zmiennych numerycznych do macierzy
+zmienne_numeryczne <- dane_clean %>%
+  select(Wiek, Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, 
+         Konflikty_w_social_mediach, Wynik_uzaleznienia)
+
+# Obliczenie korelacji
+M <- cor(zmienne_numeryczne)
+
+# Wyświetlenie macierzy korelacji
+print(M)
+```
 # 4. Wizualizacja Danych
 
 
