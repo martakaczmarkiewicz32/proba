@@ -79,7 +79,7 @@ theme_set(theme_minimal())
 ```{r wczytanie-danych}
 # Wczytanie danych
 dane <- read_csv("Students Social Media Addiction.csv")
-dane <- Students_Social_Media_Addiction
+
 # Podstawowy przegląd
 glimpse(dane)
 ```
@@ -447,6 +447,20 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychiczn
 ```
 
 #Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
+
+#4.4 Wybór platformy z podziałem na płeć
+```{r wybór-platformy-a-płeć}
+ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
+  geom_bar(position = "dodge", color = "black", alpha = 0.8) +
+  labs(title = "Wybór platformy społecznościowej w zależności od płci",
+       x = "Platforma",
+       y = "Liczba użytkowników",
+       fill = "Płeć") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+#Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
 # 5. Wnioskowanie Statystyczne
 
 
