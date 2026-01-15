@@ -64,6 +64,14 @@ if.needed("corrplot")
 if.needed("knitr")
 if.needed("kableExtra")
 if.needed("ggthemes")
+library(tidyverse)
+library(summarytools)
+library(kableExtra)
+library(classInt)
+library(psych)
+library(ggpubr)
+library(corrplot)
+library(frequency)
 
 # Ustawienie estetyki wykresów
 theme_set(theme_minimal())
@@ -71,7 +79,7 @@ theme_set(theme_minimal())
 ```{r wczytanie-danych}
 # Wczytanie danych
 dane <- read_csv("Students Social Media Addiction.csv")
-
+dane <- Students_Social_Media_Addiction
 # Podstawowy przegląd
 glimpse(dane)
 ```
@@ -212,11 +220,12 @@ dane_clean %>%
     Q3 = quantile(Sredni_Czas_Użytkowania, 0.75)
   )
 descr(dane$Avg_Daily_Usage_Hours)
-# Średnia długość użytkowania wynosi 4,91, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
+
 
 ggdensity(dane, x = "Avg_Daily_Usage_Hours", fill = "orange", alpha = 0.4) +
-+   labs(title = "Gęstość rozkładu dziennego czasu użytkowania", x = "Godziny na dobę")
+   labs(title = "Gęstość rozkładu dziennego czasu użytkowania", x = "Godziny na dobę")
 ``` 
+Średnia długość użytkowania wynosi 4,91, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
 
 ### 3.2.2 Rozkład czasu według kategorii
 ```{r czas-uzytkowania-rozkład}
@@ -227,8 +236,9 @@ dane_clean %>%
 dane_grupy <- dane_clean %>%
  count(f.Grupa_Czasu_Uzytkowania) %>%
    mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
-# Większość studentów zalicza się do grupy z średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
 ```
+Większość studentów zalicza się do grupy z średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
+
 ### 3.2.3 Najpopularniejsze platformy
 ```{r najpopularniejsze-platformy}
 # Ranking platform
@@ -236,8 +246,8 @@ dane_clean %>%
   count(Najczęściej_używana_platforma) %>%
   arrange(desc(n)) %>%
   mutate(Procent = round(n / sum(n) * 100, 1))
-# Najpopularniejszą platformą jest Instagram, z którego korzysta 35,3% studentów w próbie, następnie TikTok (21,8%) i Facebook (17,4%).
 ```
+Najpopularniejszą platformą jest Instagram, z którego korzysta 35,3% studentów w próbie, następnie TikTok (21,8%) i Facebook (17,4%).
 
 ## 3.3 Analiza poziomu uzależnienia
 
@@ -251,8 +261,8 @@ dane_clean %>%
     Mediana = median(Wynik_uzaleznienia),
     SD = sd(Wynik_uzaleznienia)
   )
-# Średni poziom uzależnienia wynosi 6,44, a odchylenie wynosi 1,59.
 ```
+Średni poziom uzależnienia wynosi 6,44, a odchylenie wynosi 1,59.
 
 ### 3.3.2 Poziomy uzależnienia według kategorii
 ```{r kategorie-uzaleznienia}
@@ -266,8 +276,8 @@ dane_clean %>%
   count(Kat_Uzaleznienia) %>%
   mutate(Procent = round(n / sum(n) * 100, 1)) %>%
   arrange(desc(n))
-# Prawie 70% studentów wykazuje umiarkowany poziom uzależnienia, a niski poziom wykazuje tylko 2,4%, pozostałe 28% wykazuje wysoki poziom uzależnienia.
 ```
+Prawie 70% studentów wykazuje umiarkowany poziom uzależnienia, a niski poziom wykazuje tylko 2,4%, pozostałe 28% wykazuje wysoki poziom uzależnienia.
 
 ## 3.4 Analiza według płci
 
@@ -282,8 +292,8 @@ dane_clean %>%
     Srednie_Uzaleznienie = mean(Wynik_uzaleznienia),
     Srednie_Zdrowie = mean(Ocena_zdrowia_psychicznego)
   )
-# Kobiety cechują się nieznacznie większym średnim czasem w mediach społecznościowych, co też skutkuje większym uzależnieniem, jednak to mężczyźni wykazują gorsze zdrowie psychiczne.
 ```
+Kobiety cechują się nieznacznie większym średnim czasem w mediach społecznościowych, co też skutkuje większym uzależnieniem, jednak to mężczyźni wykazują gorsze zdrowie psychiczne.
 
 ## 3.5 Analiza według poziomu akademickiego
 
@@ -300,6 +310,7 @@ dane_clean %>%
   arrange(desc(Sredni_Czas))
 # Studenci "High School" spędzają najwięcej czasu w mediach społecznościowych i wykazują najwyższy poziom uzależnienia, podczas gdy studenci "Graduate" mają najniższe wartości w obu tych aspektach.
 ```
+Studenci "High School" spędzają najwięcej czasu w mediach społecznościowych i wykazują najwyższy poziom uzależnienia, podczas gdy studenci "Graduate" mają najniższe wartości w obu tych aspektach.
 
 ## 3.6 Zdrowie psychiczne i sen
 
@@ -314,13 +325,14 @@ dane_clean %>%
     Najnizsza = min(Ocena_zdrowia_psychicznego),
     Najwyzsza = max(Ocena_zdrowia_psychicznego)
   )
-# Średnia ocena zdrowia psychicznego to 6,23 na 10, z czego najniższa wynosi 4 a najwyższa 9.
+
  ggplot(dane, aes(x = Sleep_Hours_Per_Night, y = Mental_Health_Score)) +
    geom_jitter(alpha = 0.4, color = "purple") +
    geom_smooth(method = "lm", color = "black") +
   labs(title = "Relacja: Długość snu vs Zdrowie psychiczne", 
         x = "Godziny snu", y = "Mental Health Score")
 ```
+Średnia ocena zdrowia psychicznego to 6,23 na 10, z czego najniższa wynosi 4 a najwyższa 9.
 
 ### 3.6.2 Jakość snu
 ```{r jakosc-snu}
@@ -333,8 +345,8 @@ stats_snu <- dane_clean %>%
   )
 
 print(stats_snu)
-# Średnia długość snu wynosi 6,87 godzin, jednak aż 50% wykazuje deficyt snu , czyli poniżej 7 godzin.
 ```
+Średnia długość snu wynosi 6,87 godzin, jednak aż 50% wykazuje deficyt snu , czyli poniżej 7 godzin.
 
 ## 3.7 Wpływ na wyniki akademickie
 
@@ -348,8 +360,8 @@ dane_clean %>%
     Sredni_Czas_Uzytkowania = mean(Sredni_Czas_Użytkowania),
     Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
   )
-# Studenci, którzy twierdzą, że media społecznościowe mają wypływ na ich wyniki w nauce, spędzają średnio o 2 godzin więcej na platformach jak i wykazują większe uzależnienie, niż ci którzy nie wykazali wpływu na naukę
 ```
+Studenci, którzy twierdzą, że media społecznościowe mają wypływ na ich wyniki w nauce, spędzają średnio o 2 godzin więcej na platformach jak i wykazują większe uzależnienie, niż ci którzy nie wykazali wpływu na naukę
 
 ## 3.8 Konflikty związane z mediami społecznościowymi
 
@@ -362,11 +374,11 @@ dane_clean %>%
     Sredni_Wynik_Uzaleznienia = mean(Wynik_uzaleznienia),
     Licznosc = n()
   )
-# Zachodzi korelacja między wynikiem uzależnienia a występowaniem konfliktów.
 # Prosta korelacja
 kor_konflikty <- cor(dane_clean$Konflikty_w_social_mediach, dane_clean$Wynik_uzaleznienia)
 print(paste("Korelacja konfliktów z uzależnieniem wynosi:", round(kor_konflikty, 2)))
 ```
+Zachodzi korelacja między wynikiem uzależnienia a występowaniem konfliktów.
 
 ## 3.9 Korelacje między zmiennymi
 
@@ -389,8 +401,9 @@ M %>%
  tabela_wiek_kor %>%
    kbl(caption = "Tabela 5. Korelacja wieku z pozostałymi cechami ilościowymi", digits = 2) %>%
    kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed"))
- # Najmniejsze korelacje występują przy zmiennej "wiek". Najwyższa korelacja zachodzi dla wyniku uzależnienia i występowaniu konfliktów. Mocno na siebie oddziałują również czas użytkowania i ocena zdrowia psychicznego.
 ```
+Najmniejsze korelacje występują przy zmiennej "wiek". Najwyższa korelacja zachodzi dla wyniku uzależnienia i występowaniu konfliktów. Mocno na siebie oddziałują również czas użytkowania i ocena zdrowia psychicznego.
+
 # 4. Wizualizacja Danych
 #W tej części przedstawiono graficzną analizę rozkładów zmiennych oraz zależności między nimi
 
