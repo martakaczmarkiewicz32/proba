@@ -422,6 +422,18 @@ ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platfor
         legend.position = "none")
 #Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
 ```
+#4.3 Czas użytkowania a zdrowie psychiczne
+```{r czas-korzystania-a-zdrowie}
+ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychicznego)) +
+  geom_jitter(color = "darkgreen", alpha = 0.4, width = 0.2) + 
+  geom_smooth(method = "lm", color = "darkred", se = TRUE) +
+  labs(title = "Korelacja: Czas użytkowania mediów a ocena zdrowia psychicznego",
+       x = "Godziny spędzane dziennie",
+       y = "Ocena zdrowia psychicznego (1-10)") +
+  theme_minimal()
+```
+
+#Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
 # 5. Wnioskowanie Statystyczne
 
 
