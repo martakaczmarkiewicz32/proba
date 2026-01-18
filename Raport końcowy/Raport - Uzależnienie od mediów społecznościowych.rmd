@@ -105,7 +105,7 @@ suma_brakow <- sum(is.na(dane))
 procent_brakow <- (suma_brakow / (nrow(dane) * ncol(dane))) * 100
 ```
 
-ops braku brakow
+opis braku brakow
 
 
 ## 2.2 Walidacja wartości zmiennych
@@ -195,8 +195,8 @@ print(demografia)
 demografia %>%
    kbl(caption = "Struktura demograficzna próby") %>%
   kable_styling(full_width = F)
-# Njawięcej danych pochodzi z Indii, jest to 7,5% próby. Następna najliczniejsza grupa pochodzi z USA (ponad 5%)
 ```
+Njawięcej danych pochodzi z Indii, jest to 7,5% próby. Następna najliczniejsza grupa pochodzi z USA (ponad 5%)
 
 ### 3.1.2 Podstawowe statystyki zmiennych ciągłych
 ```{r statystyki-opisowe} 
@@ -221,14 +221,16 @@ dane_clean %>%
     Max = max(Sredni_Czas_Użytkowania),
     Q1 = quantile(Sredni_Czas_Użytkowania, 0.25),
     Q3 = quantile(Sredni_Czas_Użytkowania, 0.75)
-  )
+  ) %>%
+  kbl(caption = "Charakterystyki opisowe czasu użytkowania mediów społecznościowych", digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 descr(dane$Avg_Daily_Usage_Hours)
 
 
 ggdensity(dane, x = "Avg_Daily_Usage_Hours", fill = "orange", alpha = 0.4) +
    labs(title = "Gęstość rozkładu dziennego czasu użytkowania", x = "Godziny na dobę")
 ``` 
-Średnia długość użytkowania wynosi 4,91, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
+Średnia długość użytkowania wynosi 4,92, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
 
 ### 3.2.2 Rozkład czasu według kategorii
 ```{r czas-uzytkowania-rozkład}
@@ -239,6 +241,10 @@ dane_clean %>%
 dane_grupy <- dane_clean %>%
  count(f.Grupa_Czasu_Uzytkowania) %>%
    mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
+dane_grupy %>%
+  kbl(caption = "Struktura badanej próby według grup czasu użytkowania", 
+      col.names = c("Grupa czasu", "Liczebność (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Większość studentów zalicza się do grupy z średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
 
@@ -248,7 +254,10 @@ Większość studentów zalicza się do grupy z średnim czasem użytkowania, cz
 dane_clean %>%
   count(Najczęściej_używana_platforma) %>%
   arrange(desc(n)) %>%
-  mutate(Procent = round(n / sum(n) * 100, 1))
+  mutate(Procent = round(n / sum(n) * 100, 1))%>%
+  kbl(caption = "Ranking najczęściej używanych platform mediów społecznościowych",
+      col.names = c("Platforma", "Liczba użytkowników (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Najpopularniejszą platformą jest Instagram, z którego korzysta 35,3% studentów w próbie, następnie TikTok (21,8%) i Facebook (17,4%).
 
@@ -263,7 +272,11 @@ dane_clean %>%
     Srednia_Uzaleznienie = mean(Wynik_uzaleznienia),
     Mediana = median(Wynik_uzaleznienia),
     SD = sd(Wynik_uzaleznienia)
-  )
+  )%>%
+  kbl(caption = "Statystyki opisowe poziomu uzależnienia studentów",
+      col.names = c("Średnia", "Mediana", "Odchylenie standardowe"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Średni poziom uzależnienia wynosi 6,44, a odchylenie wynosi 1,59.
 
@@ -278,7 +291,10 @@ dane_clean %>%
   )) %>%
   count(Kat_Uzaleznienia) %>%
   mutate(Procent = round(n / sum(n) * 100, 1)) %>%
-  arrange(desc(n))
+  arrange(desc(n))%>%
+  kbl(caption = "Liczba studentów według poziomu uzależnienia",
+      col.names = c("Kategoria uzależnienia", "Liczebność (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Prawie 70% studentów wykazuje umiarkowany poziom uzależnienia, a niski poziom wykazuje tylko 2,4%, pozostałe 28% wykazuje wysoki poziom uzależnienia.
 
@@ -294,7 +310,11 @@ dane_clean %>%
     Sredni_Czas = mean(Sredni_Czas_Użytkowania),
     Srednie_Uzaleznienie = mean(Wynik_uzaleznienia),
     Srednie_Zdrowie = mean(Ocena_zdrowia_psychicznego)
-  )
+  )%>%
+  kbl(caption = "Porównanie wskaźników aktywności i dobrostanu według płci",
+      col.names = c("Płeć", "Liczebność (n)", "Śr. czas użytkowania", "Śr. wynik uzależnienia", "Śr. zdrowie psychiczne"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 Kobiety cechują się nieznacznie większym średnim czasem w mediach społecznościowych, co też skutkuje większym uzależnieniem, jednak to mężczyźni wykazują gorsze zdrowie psychiczne.
 
@@ -310,8 +330,11 @@ dane_clean %>%
     Sredni_Sen = mean(Godziny_snu),
     Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
   ) %>%
-  arrange(desc(Sredni_Czas))
-# Studenci "High School" spędzają najwięcej czasu w mediach społecznościowych i wykazują najwyższy poziom uzależnienia, podczas gdy studenci "Graduate" mają najniższe wartości w obu tych aspektach.
+  arrange(desc(Sredni_Czas))%>%
+  kbl(caption = "Charakterystyki aktywności w mediach społecznościowych i dobrostanu według poziomu akademickiego",
+      col.names = c("Poziom akademicki", "Śr. czas użytkowania", "Śr. czas snu", "Śr. wynik uzależnienia"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Studenci "High School" spędzają najwięcej czasu w mediach społecznościowych i wykazują najwyższy poziom uzależnienia, podczas gdy studenci "Graduate" mają najniższe wartości w obu tych aspektach.
 
@@ -327,7 +350,11 @@ dane_clean %>%
     Mediana = median(Ocena_zdrowia_psychicznego),
     Najnizsza = min(Ocena_zdrowia_psychicznego),
     Najwyzsza = max(Ocena_zdrowia_psychicznego)
-  )
+  )%>%
+  kbl(caption = "Statystyki opisowe oceny zdrowia psychicznego studentów",
+      col.names = c("Średnia ocena", "Mediana", "Ocena minimalna", "Ocena maksymalna"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 
  ggplot(dane, aes(x = Sleep_Hours_Per_Night, y = Mental_Health_Score)) +
    geom_jitter(alpha = 0.4, color = "purple") +
@@ -345,7 +372,11 @@ stats_snu <- dane_clean %>%
     Srednia_Godzin = mean(Godziny_snu),
     Liczba_z_Deficytem = sum(Godziny_snu < 7), # Deficyt poniżej 7h
     Procent_z_Deficytem = mean(Godziny_snu < 7) * 100
-  )
+  )%>%
+  kbl(caption = "Analiza jakości snu",
+      col.names = c("Średnia liczba godzin", "Liczba osób z deficytem (<7h)", "Procent osób z deficytem (%)"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 
 print(stats_snu)
 ```
@@ -362,7 +393,11 @@ dane_clean %>%
     Liczba = n(),
     Sredni_Czas_Uzytkowania = mean(Sredni_Czas_Użytkowania),
     Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
-  )
+  ) %>%
+  kbl(caption = "Aktywność w mediach społecznościowych a deklarowany wpływ na wyniki w nauce",
+      col.names = c("Czy wpływa na wyniki?", "Liczebność (n)", "Śr. czas użytkowania", "Śr. wynik uzależnienia"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 Studenci, którzy twierdzą, że media społecznościowe mają wypływ na ich wyniki w nauce, spędzają średnio o 2 godzin więcej na platformach jak i wykazują większe uzależnienie, niż ci którzy nie wykazali wpływu na naukę
 
@@ -376,7 +411,11 @@ dane_clean %>%
   summarise(
     Sredni_Wynik_Uzaleznienia = mean(Wynik_uzaleznienia),
     Licznosc = n()
-  )
+  )%>%
+  kbl(caption = "Związek między konfliktami a średnim poziomem uzależnienia",
+      col.names = c("Liczba konfliktów", "Śr. wynik uzależnienia", "Liczebność (n)"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 # Prosta korelacja
 kor_konflikty <- cor(dane_clean$Konflikty_w_social_mediach, dane_clean$Wynik_uzaleznienia)
 print(paste("Korelacja konfliktów z uzależnieniem wynosi:", round(kor_konflikty, 2)))
@@ -397,12 +436,12 @@ M <- cor(zmienne_numeryczne)
 # Wyświetlenie macierzy korelacji
 print(M)
 M %>%
-   kbl(caption = "Tabela 4. Macierz korelacji Pearsona dla zmiennych ilościowych", digits = 2) %>%
+   kbl(caption = "Macierz korelacji Pearsona dla zmiennych ilościowych", digits = 2) %>%
    kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
  tabela_wiek_kor <- as.data.frame(M[, 1])
  colnames(tabela_wiek_kor) <- "Współczynnik korelacji (r)"
  tabela_wiek_kor %>%
-   kbl(caption = "Tabela 5. Korelacja wieku z pozostałymi cechami ilościowymi", digits = 2) %>%
+   kbl(caption = "Korelacja wieku z pozostałymi cechami ilościowymi", digits = 2) %>%
    kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 Najmniejsze korelacje występują przy zmiennej "wiek". Najwyższa korelacja zachodzi dla wyniku uzależnienia i występowaniu konfliktów. Mocno na siebie oddziałują również czas użytkowania i ocena zdrowia psychicznego.
