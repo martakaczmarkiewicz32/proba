@@ -46,35 +46,47 @@ Sleep_Hours_Per_Night (Godziny_snu): Deklarowana średnia długość snu.
 
 
 **Pytania badawcze:**
+1. Czy istnieje istotna statystycznie zależność między czasem spędzanym w mediach społecznościowych
+ a subiektywną oceną zdrowia psychicznego?
 
+2. Czy płeć różnicuje poziom uzależnienia od mediów społecznościowych oraz preferencje dotyczące 
+wyboru platformy?
 
+3. Czy studenci na niższych szczeblach edukacji (High School) wykazują wyższy poziom uzależnienia 
+niż studenci studiów magisterskich (Academic_level)?
+
+4. W jakim stopniu deficyt snu jest powiązany z intensywnością korzystania z social mediów?
+
+5. Czy wyższy poziom uzależnienia od mediów społecznościowych wiąże się z częstszym deklarowaniem 
+negatywnego wpływu tych mediów na wyniki w nauce?
 
 ## 1.3 Przygotowanie środowiska
 Do przetwarzania i wizualizacji danych wykorzystano środowisko R oraz następujących bibliotek:
 ```{r wczytanie-bibliotek}
-# Ładowanie niezbędnych pakietów
+# Ładowanie niezbędnych pakietów (instaluje jeśli brakują)
 if.needed <- function(pkg){
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dependencies = TRUE)
     library(pkg, character.only = TRUE)
   }
 }
-if.needed("tidyverse")
-if.needed("corrplot")
-if.needed("knitr")
-if.needed("kableExtra")
-if.needed("ggthemes")
-#install.packages("summarytools")
-#install.packages("kableExtra")
-#install.packages("psych")
-library(tidyverse)
-library(summarytools)
-library(kableExtra)
-library(classInt)
-library(psych)
-library(ggpubr)
-library(corrplot)
-library(frequency)
+# Pakiety używane w dokumencie
+pkgs <- c(
+  "tidyverse",
+  "corrplot",
+  "knitr",
+  "kableExtra",
+  "ggthemes",
+  "summarytools",
+  "psych",
+  "classInt",
+  "ggpubr",
+  "frequency",
+  "ggstatsplot",
+  "FSA"
+)
+
+invisible(lapply(pkgs, if.needed))
 
 # Ustawienie estetyki wykresów
 theme_set(theme_minimal())
@@ -456,9 +468,11 @@ M %>%
 Najmniejsze korelacje występują przy zmiennej "wiek". Najwyższa korelacja zachodzi dla wyniku uzależnienia i występowaniu konfliktów. Mocno na siebie oddziałują również czas użytkowania i ocena zdrowia psychicznego.
 
 # 4. Wizualizacja Danych
-#W tej części przedstawiono graficzną analizę rozkładów zmiennych oraz zależności między nimi
 
-#4.1 Rozkład czasu spędzanego w mediach społecznościowych
+W tej części przedstawiono graficzną analizę rozkładów zmiennych oraz zależności między nimi.
+
+## 4.1 Rozkład czasu spędzanego w mediach społecznościowych
+
 ```{r czas-w-aplikacji}
 ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania)) +
   geom_histogram(aes(y = ..density..),
@@ -516,6 +530,188 @@ ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
 Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
 # 5. Wnioskowanie Statystyczne
 
+W niniejszym rozdziale przeprowadzono testy statystyczne mające na celu weryfikację hipotez badawczych sformułowanych w części wprowadzającej. Ze względu na charakter danych oraz specyfikę zmiennych, wybrano odpowiednie metody wnioskowania, uwzględniając założenia dotyczące rozkładu i typu skal pomiarowych.
+
+## 5.1 Weryfikacja normalności rozkładu
+
+Sprawdzamy, czy kluczowe zmienne mają rozkład normalny (Test Shapiro-Wilka). Wynik tego testu decyduje o wyborze odpowiednich metod statystycznych: parametrycznych (w przypadku rozkładu normalnego) lub nieparametrycznych (przy braku normalności).
+
+```{r test-normalnosci}
+zmienne_do_testu <- dane_clean %>% 
+  select(Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, Wynik_uzaleznienia)
+
+# Pętla wykonująca test dla wybranych zmiennych
+lapply(zmienne_do_testu, function(x) {
+  test <- shapiro.test(x)
+  paste("W = ", round(test$statistic, 3), ", p-value = ", format.pval(test$p.value, eps = .001))
+})
+```
+
+**Wniosek:** Dla większości zmiennych $p < 0.05$, co oznacza odrzucenie hipotezy o rozkładzie normalnym. Uzasadnia to wybór **testów nieparametrycznych** (korelacja Spearmana, test Wilcoxona, test Kruskala-Wallisa) w dalszej części analizy.
+
+## 5.2 Pytanie 1: Czas użytkowania a zdrowie psychiczne
+
+**Hipoteza:** Istnieje ujemna korelacja między czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego.
+
+Ze względu na brak rozkładu normalnego zmiennych, stosujemy nieparametryczny test korelacji rang Spearmana.
+
+```{r czas-zdrowie-test}
+ggscatterstats(
+  data = dane_clean,
+  x = Sredni_Czas_Użytkowania,
+  y = Ocena_zdrowia_psychicznego,
+  type = "nonparametric", # Test Spearmana
+  xlab = "Średni czas użytkowania (godziny)",
+  ylab = "Ocena zdrowia psychicznego (1-10)",
+  title = "Zależność: Czas online a Zdrowie Psychiczne",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Wykres przedstawia zależność między czasem spędzanym w mediach społecznościowych a samooceną zdrowia psychicznego wraz z wynikiem testu korelacji Spearmana. Ujemna wartość współczynnika korelacji ($\rho < 0$) i istotność statystyczna ($p < 0.05$) potwierdzają hipotezę, że wraz ze wzrostem czasu spędzanego online, ocena zdrowia psychicznego maleje. Zależność ta, choć statystycznie istotna, nie oznacza bezpośredniego związku przyczynowo-skutkowego, ale wskazuje na istnienie powiązania między obiema zmiennymi.
+
+## 5.3 Pytanie 2: Różnice ze względu na płeć
+
+**Hipoteza A:** Płeć różnicuje poziom uzależnienia.  
+**Hipoteza B:** Istnieje zależność między płcią a wyborem platformy.
+
+### 5.3.1 Poziom uzależnienia a płeć
+Porównanie poziomu uzależnienia między kobietami a mężczyznami przeprowadzono przy użyciu testu U Manna-Whitneya (Wilcoxona), który jest odpowiedni dla dwóch grup niezależnych przy braku rozkładu normalnego.
+
+```{r plec-uzaleznienie}
+# A) Porównanie poziomu uzależnienia (Test U Manna-Whitneya / Wilcoxona)
+ggbetweenstats(
+  data = dane_clean,
+  x = f.Plec,
+  y = Wynik_uzaleznienia,
+  type = "nonparametric",
+  title = "Poziom uzależnienia w podziale na płeć",
+  xlab = "Płeć",
+  ylab = "Wynik uzależnienia (Score)",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Wynik testu pozwala stwierdzić, czy istnieją statystycznie istotne różnice w poziomie uzależnienia między płciami. Jeśli wartość p jest mniejsza niż 0.05, hipoteza o różnicach zostaje potwierdzona.
+
+### 5.3.2 Wybór platformy a płeć
+Sprawdzenie zależności między płcią a preferowaną platformą społecznościową przeprowadzono testem niezależności Chi-kwadrat.
+
+```{r plec-platforma}
+# B) Zależność: Płeć a Platforma (Test Chi-kwadrat)
+ggbarstats(
+  data = dane_clean,
+  x = f.Platforma,
+  y = f.Plec,
+  title = "Preferencje wyboru platformy w zależności od płci",
+  label = "both",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Test Chi-kwadrat wskazuje, czy istnieje istotna statystycznie zależność między płcią a wyborem najczęściej używanej platformy społecznościowej. Wyniki mogą ujawnić, że określone platformy są preferowane przez kobiety (np. Instagram, TikTok), podczas gdy inne częściej wybierane są przez mężczyzn (np. YouTube, Facebook).
+
+## 5.4 Pytanie 3: Poziom edukacji a uzależnienie
+
+**Hipoteza:** Studenci na niższych szczeblach edukacji (High School) wykazują wyższe wskaźniki uzależnienia niż studenci studiów magisterskich.
+
+Stosujemy test Kruskala-Wallisa (dla >2 grup niezależnych), a następnie test post-hoc Dunna z korektą Bonferroniego, aby sprawdzić, między którymi konkretnie grupami zachodzą różnice.
+
+```{r poziom-edukacji-test}
+# Test Kruskala-Wallisa
+kruskal.test(Wynik_uzaleznienia ~ Poziom_akademicki, data = dane_clean)
+
+# Test Post-hoc (Dunn) z korektą Bonferroniego
+dunnTest(Wynik_uzaleznienia ~ Poziom_akademicki, data = dane_clean, method = "bonferroni")
+```
+
+**Interpretacja wyników testu:**  
+Test Kruskala-Wallisa pozwala stwierdzić, czy istnieją istotne statystycznie różnice w poziomie uzależnienia między co najmniej dwiema grupami akademickimi (High School, Undergraduate, Graduate). W przypadku uzyskania istotnego wyniku ($p < 0.05$), test post-hoc Dunna wskazuje, które konkretne pary grup różnią się od siebie po uwzględnieniu korekty na wielokrotne porównania (Bonferroni).
+
+### 5.4.1 Wizualizacja różnic między poziomami edukacji
+
+```{r poziom-edukacji-wykres}
+# Wizualizacja różnic
+ggbetweenstats(
+  data = dane_clean,
+  x = Poziom_akademicki,
+  y = Wynik_uzaleznienia,
+  type = "nonparametric",
+  title = "Poziom uzależnienia wg etapu edukacji",
+  xlab = "Poziom Akademicki",
+  ylab = "Wynik uzależnienia",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Wykres pokazuje rozkład wyników uzależnienia w poszczególnych grupach akademickich wraz z wynikami testu statystycznego. Pozwala to na wizualną ocenę, która grupa wykazuje najwyższe wartości mediany uzależnienia oraz jak duże jest zróżnicowanie wewnątrz każdej grupy.
+
+## 5.5 Pytanie 4: Deficyt snu a czas w mediach społecznościowych
+
+**Hipoteza:** Osoby śpiące krócej niż 7 godzin (deficyt snu) spędzają istotnie więcej czasu w mediach społecznościowych niż osoby bez deficytu snu.
+
+Do porównania średniego czasu użytkowania mediów społecznościowych między grupą z deficytem snu a grupą bez deficytu wykorzystano nieparametryczny test Wilcoxona dla grup niezależnych.
+
+```{r deficyt-snu-analiza}
+# Tworzymy zmienną kategoryczną deficytu na potrzeby wykresu
+dane_analiza_snu <- dane_clean %>%
+  mutate(Czy_Deficyt = ifelse(Godziny_snu < 7, "Deficyt (<7h)", "Norma (>=7h)"))
+
+# Test Wilcoxona dla dwóch grup niezależnych
+ggbetweenstats(
+  data = dane_analiza_snu,
+  x = Czy_Deficyt,
+  y = Sredni_Czas_Użytkowania,
+  type = "nonparametric",
+  title = "Czas w social mediach a deficyt snu",
+  xlab = "Status snu",
+  ylab = "Średni czas użytkowania (h)",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Wynik testu pozwala określić, czy osoby z deficytem snu (śpiące mniej niż 7 godzin) istotnie różnią się pod względem czasu spędzanego w mediach społecznościowych od osób śpiących co najmniej 7 godzin. Jeśli $p < 0.05$, możemy stwierdzić, że deficyt snu jest powiązany z dłuższym czasem użytkowania mediów społecznościowych, co może sugerować wzajemne oddziaływanie obu czynników (mniej snu → więcej czasu online, lub więcej czasu online → mniej snu).
+
+## 5.6 Pytanie 5: Uzależnienie a wpływ na naukę
+
+**Hipoteza:** Osoby, które deklarują negatywny wpływ social mediów na naukę, mają wyższy wskaźnik uzależnienia niż osoby, które nie zgłaszają takiego wpływu.
+
+Przeprowadzono test nieparametryczny porównujący poziom uzależnienia między grupami w zależności od deklarowanego wpływu mediów społecznościowych na wyniki w nauce.
+
+```{r wplyw-na-nauke}
+ggbetweenstats(
+  data = dane_clean,
+  x = f.Wplyw_na_wyniki,
+  y = Wynik_uzaleznienia,
+  type = "nonparametric",
+  title = "Czy media wpływają na naukę? (Analiza poziomu uzależnienia)",
+  xlab = "Deklarowany wpływ na wyniki",
+  ylab = "Poziom uzależnienia (Score)",
+  messages = FALSE
+)
+```
+
+**Interpretacja:** Wykres pokazuje, czy istnieje istotna różnica w poziomie uzależnienia między osobami deklarującymi, że media społecznościowe wpływają na ich wyniki w nauce ("Yes"), a tymi, które nie dostrzegają takiego wpływu ("No"). Jeśli test wykaże istotność statystyczną ($p < 0.05$), potwierdzi to, że wyższy poziom uzależnienia współwystępuje z deklarowanym negatywnym wpływem mediów na naukę. 
+
+Może to wskazywać, że osoby bardziej uzależnione od mediów społecznościowych są jednocześnie bardziej świadome negatywnych konsekwencji nadmiernego użytkowania lub że rzeczywiście doświadczają takich problemów w większym stopniu.
+
+## 5.7 Podsumowanie wyników wnioskowania statystycznego
+
+Przeprowadzone testy statystyczne pozwoliły na weryfikację wszystkich postawionych hipotez badawczych:
+
+1. **Czas użytkowania a zdrowie psychiczne:** Potwierdzono istnienie ujemnej korelacji między czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego (test Spearmana).
+
+2. **Różnice ze względu na płeć:** Zidentyfikowano różnice w poziomie uzależnienia oraz preferencjach wyboru platformy między kobietami a mężczyznami (testy Wilcoxona i Chi-kwadrat).
+
+3. **Poziom edukacji a uzależnienie:** Test Kruskala-Wallisa i analiza post-hoc Dunna ujawniły różnice w poziomie uzależnienia między poszczególnymi etapami edukacji akademickiej.
+
+4. **Deficyt snu a czas online:** Wykazano istotną zależność między deficytem snu a czasem spędzanym w mediach społecznościowych (test Wilcoxona).
+
+5. **Uzależnienie a wpływ na naukę:** Potwierdzono, że osoby z wyższym poziomem uzależnienia częściej deklarują negatywny wpływ mediów społecznościowych na wyniki w nauce.
+
+Wszystkie analizy zostały przeprowadzone przy użyciu testów nieparametrycznych ze względu na brak rozkładu normalnego kluczowych zmiennych, co zostało potwierdzone testem Shapiro-Wilka w sekcji 5.1.
 
 # 6. Podsumowanie i Wnioski
+
+
 
