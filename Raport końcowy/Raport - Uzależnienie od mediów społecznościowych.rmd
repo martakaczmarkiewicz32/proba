@@ -370,12 +370,6 @@ dane_clean %>%
       col.names = c("Średnia ocena", "Mediana", "Ocena minimalna", "Ocena maksymalna"),
       digits = 2) %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
- ggplot(dane, aes(x = Sleep_Hours_Per_Night, y = Mental_Health_Score)) +
-   geom_jitter(alpha = 0.4, color = "purple") +
-   geom_smooth(method = "lm", color = "black") +
-  labs(title = "Relacja: Długość snu vs Zdrowie psychiczne", 
-        x = "Godziny snu", y = "Mental Health Score")
 ```
 Średnia ocena zdrowia psychicznego to 6,23 na 10, z czego najniższa wynosi 4 a najwyższa 9.
 
