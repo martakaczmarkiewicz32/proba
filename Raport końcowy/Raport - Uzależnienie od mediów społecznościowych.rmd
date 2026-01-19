@@ -64,9 +64,9 @@ if.needed("corrplot")
 if.needed("knitr")
 if.needed("kableExtra")
 if.needed("ggthemes")
-install.packages("summarytools")
-install.packages("kableExtra")
-install.packages("psych")
+#install.packages("summarytools")
+#install.packages("kableExtra")
+#install.packages("psych")
 library(tidyverse)
 library(summarytools)
 library(kableExtra)
@@ -235,9 +235,6 @@ ggdensity(dane, x = "Avg_Daily_Usage_Hours", fill = "orange", alpha = 0.4) +
 ### 3.2.2 Rozkład czasu według kategorii
 ```{r czas-uzytkowania-rozkład}
 # Analiza stworzonych grup (Niski/Średni/Wysoki)
-dane_clean %>%
-  count(f.Grupa_Czasu_Uzytkowania) %>%
-  mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
 dane_grupy <- dane_clean %>%
  count(f.Grupa_Czasu_Uzytkowania) %>%
    mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
@@ -462,8 +459,9 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania)) +
        x = "Liczba godzin dziennie",
        y = "Gęstość") +
   theme_minimal()
-#Histogram przedstawia rozkład średniego czasu spędzanego dziennie w mediach społecznościowych. Największa koncentracja obserwacji występuje w przedziale około 4–6 godzin dziennie. Maksimum krzywej gęstości znajduje się w okolicach 5 godzin.Rozkład wykazuje asymetrię prawostronną, co oznacza, że część użytkowników spędza w mediach społecznościowych znacznie więcej czasu niż przeciętnie. W prawej części rozkładu widoczny jest „ogon” obejmujący wartości powyżej 7–8 godzin dziennie, które mogą świadczyć o intensywnym korzystaniu z mediów społecznościowych przez niewielką grupę respondentów. Z kolei nieliczne obserwacje poniżej 2–3 godzin dziennie sugerują, że relatywnie mała część badanych korzysta z mediów społecznościowych w ograniczonym zakresie. Ogólny kształt rozkładu wskazuje na umiarkowane zróżnicowanie czasu użytkowania, przy dominacji średnich wartości i stopniowym spadku częstości wraz ze wzrostem liczby godzin. Podsumowując, wykres pokazuje, że większość respondentów spędza w mediach społecznościowych kilka godzin dziennie, natomiast skrajnie niskie i bardzo wysokie wartości występują rzadziej, co potwierdza istnienie zróżnicowanych, lecz wyraźnie skoncentrowanych wzorców użytkowania.
+
 ```
+Histogram przedstawia rozkład średniego czasu spędzanego dziennie w mediach społecznościowych. Największa koncentracja obserwacji występuje w przedziale około 4–6 godzin dziennie. Maksimum krzywej gęstości znajduje się w okolicach 5 godzin.Rozkład wykazuje asymetrię prawostronną, co oznacza, że część użytkowników spędza w mediach społecznościowych znacznie więcej czasu niż przeciętnie. W prawej części rozkładu widoczny jest „ogon” obejmujący wartości powyżej 7–8 godzin dziennie, które mogą świadczyć o intensywnym korzystaniu z mediów społecznościowych przez niewielką grupę respondentów. Z kolei nieliczne obserwacje poniżej 2–3 godzin dziennie sugerują, że relatywnie mała część badanych korzysta z mediów społecznościowych w ograniczonym zakresie. Ogólny kształt rozkładu wskazuje na umiarkowane zróżnicowanie czasu użytkowania, przy dominacji średnich wartości i stopniowym spadku częstości wraz ze wzrostem liczby godzin. Podsumowując, wykres pokazuje, że większość respondentów spędza w mediach społecznościowych kilka godzin dziennie, natomiast skrajnie niskie i bardzo wysokie wartości występują rzadziej, co potwierdza istnienie zróżnicowanych, lecz wyraźnie skoncentrowanych wzorców użytkowania.
 
 #4.2 Poziom uzależnienia w zależności od platformy
 ```{r poziom-uzaleznienia-platforma}
@@ -475,8 +473,9 @@ ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platfor
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
-#Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
 ```
+Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
+
 #4.3 Czas użytkowania a zdrowie psychiczne
 ```{r czas-korzystania-a-zdrowie}
 ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychicznego)) +
@@ -488,7 +487,7 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychiczn
   theme_minimal()
 ```
 
-#Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
+Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
 
 #4.4 Wybór platformy z podziałem na płeć
 ```{r wybór-platformy-a-płeć}
@@ -502,7 +501,7 @@ ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-#Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
+Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
 # 5. Wnioskowanie Statystyczne
 
 
