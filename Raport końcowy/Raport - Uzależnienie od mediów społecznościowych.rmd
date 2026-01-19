@@ -104,26 +104,7 @@ braki %>%
 suma_brakow <- sum(is.na(dane))
 procent_brakow <- (suma_brakow / (nrow(dane) * ncol(dane))) * 100
 ```
-
-opis braku brakow
-
-
-## 2.2 Walidacja wartości zmiennych
-```{r data-validation}
-# Sprawdzenie, czy występują wartości naruszające logiczne reguły
-logiczne_naruszenia <- dane %>%
-  filter(
-    Age < 15 | Age > 30 |
-    Avg_Daily_Usage_Hours < 0 | Avg_Daily_Usage_Hours > 16 |
-    Sleep_Hours_Per_Night < 0 | Sleep_Hours_Per_Night > 14 |
-    Mental_Health_Score < 1 | Mental_Health_Score > 10 |
-    Addicted_Score < 1 | Addicted_Score > 10
-  )
-
-liczba_bledow <- nrow(logiczne_naruszenia)
-```
-
-## 2.3 Transformacja i tłumaczenie
+## 2.2 Transformacja i tłumaczenie
 ```{r data-cleaning}
 dane_clean <- dane %>%
   rename(
@@ -163,6 +144,43 @@ dane_clean <- dane %>%
 head(dane_clean) %>%
   kbl(caption = "Fragment przetworzonego zbioru danych") %>%
   kable_styling()
+```
+## 2.3 Walidacja spójności logicznej
+```{r logical-validation}
+# Definicja kryteriów i zliczanie przypadków
+wyniki_weryfikacji <- dane_clean %>%
+  summarise(
+    `Ocena zdrowia = 10 przy śnie < 4h` = sum(Ocena_zdrowia_psychicznego == 10 & Godziny_snu < 4, na.rm = TRUE),
+    `Suma czasu (Media + Sen) > 22h` = sum(Sredni_Czas_Użytkowania + Godziny_snu > 22, na.rm = TRUE),
+    `Wiek < 18 lat na poziomie Graduate` = sum(Wiek < 18 & Poziom_akademicki == "Graduate", na.rm = TRUE),
+    `Maksymalne uzależnienie (10) bez wpływu na naukę` = sum(Wynik_uzaleznienia == 10 & Wplyw_na_wyniki == "No", na.rm = TRUE),
+    `Maksymalne uzależnienie (10) bez konfliktów` = sum(Wynik_uzaleznienia == 10 & Konflikty_w_social_mediach == 0, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "Kryterium weryfikacji", values_to = "Liczba przypadków")
+
+# Uzasadnienie
+tabela_opisowa <- tibble(
+  `Kryterium weryfikacji` = c(
+    "Ocena zdrowia = 10 przy śnie < 4h",
+    "Suma czasu (Media + Sen) > 22h",
+    "Wiek < 18 lat na poziomie Graduate",
+    "Maksymalne uzależnienie (10) bez wpływu na naukę",
+    "Maksymalne uzależnienie (10) bez konfliktów"
+  ),
+  `Dlaczego to sprawdzamy?` = c(
+    "Biologicznie trudne do utrzymania.",
+    "Brak czasu na fizjologiczne potrzeby i naukę.",
+    "Mało prawdopodobne osiągnięcie poziomu magisterskiego przed 18 r.ż.",
+    "Skrajne uzależnienie zazwyczaj wpływa na wyniki.",
+    "Silne uzależnienie zazwyczaj generuje spory z otoczeniem."
+  )
+)
+
+# Połączenie i wyświetlenie tabeli
+left_join(tabela_opisowa, wyniki_weryfikacji, by = "Kryterium weryfikacji") %>%
+  kbl(caption = "Zestawienie potencjalnych niespójności w danych") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover")) %>%
+  column_spec(3, bold = TRUE, color = ifelse(wyniki_weryfikacji$`Liczba przypadków` > 0, "red", "green"))
 ```
 # 3. Analiza Opisowa
 
