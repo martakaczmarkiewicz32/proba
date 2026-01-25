@@ -355,4 +355,12 @@ dane_clean %>%
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank()
   )
-
+#wnioski i podsumowanie; brudnopis
+# Przeprowadzenie analizy na ponad 700 studentów pozwoliło na zrozumienie mechanizmów korzystania z mediów społecznościowych oraz ich wpływu na życie studentów.
+# Z analizy wynikają następujące wnioski:
+# - Występuje silna korelacja między czasem spędzonych w mediach społecznościowych a ich dobrostanem; Wykazano silną ujemną korelację rang Spearmana między czasem użytkowania a zdrowiem psychicznym. Im więcej czasu studenci spędzają w mediach tym niżej oceniają swoje zdrowie psychiczne.
+# - Zaobserwowano negatywny wpływ na wyniki w nauce przy dłuższym czasie korzystania z mediów społecznościowych.
+# - Wraz z postępem edukacji spada czas spędzony w mediach społecznościowych jak i wyniki uzależnienia.
+# - Nie zaobserwowano istotnej różnicy w poziomie uzależnienia w rozróżnieniu płci, jednak wypływa ona na wybór platformy, kobiety częściej wybierają Instagrama i Tiktoka, mężczyźni natomiast Facebooka i YouTube.
+# - Wykazano wzrost konfliktów wraz ze wzrostem poziomu uzależnienia.
+# Podsumuwując wyniki analizy można stwierdzić, że media społęcznościowe są dużym wyzwaniem dla życia młodych dorosłych. Silnie wpływają na ich sen, zdrowie psychiczne jak i wyniki w nauce co też świadczy o wyzwaniu dla obecnej edukacji. Warto byłoby pogłębić te badania o aspekty jakościowe korzystania z mediów.
