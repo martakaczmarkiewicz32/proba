@@ -14,7 +14,6 @@ output:
     code_folding: hide    # Ukrywa kod, ale pozwala go rozwinąć (klucz do profesjonalizmu)
     df_print: paged       # Ładne, interaktywne tabele zamiast surowego tekstu
 ---
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
