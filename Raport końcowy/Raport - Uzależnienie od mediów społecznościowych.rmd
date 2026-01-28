@@ -585,6 +585,9 @@ Statystyka	Wartość
 Rho Spearmana	-0.802
 Wartość p	<2e-16
 N	705
+**Wnioski**
+Wartość p jest znacznie pozniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje statystyczna zależność między czasem spędzonym w mediach społecznościowych a oceną zdrowia psychicznego.
+Współczynnik korelacji rang Spearmana wynosi -0,802, co wskazuje na silną ujemną korelację. Oznacza to, że wraz ze wzrostem liczby godzin spędzanych w mediach społecznościowych, ocena zdrowia psychicznego wyraźnie spada.
 
 ## 5.2 Hipoteza 2: Płeć a poziom uzależnienia
 
@@ -632,6 +635,8 @@ Wyniki testu U Manna-Whitneya
 Statystyka	Wartość
 Statystyka W	66322.5
 Wartość p	0.113
+**Wnioski**
+Wartość p jest wyższa niż próg 0,05, oznacza to, że mamy brak podstaw do odrzucenia hipotezy zerowej. Różnica w poziomie uzależnienia między kobietami a mężczyznami nie jest istotna statystycznie. Wynik ten pokazuje, że płeć nie jest czynnikiem różniującym skłonność do uzależnienia od mediów społecznościowych.
 
 ## 5.3 Hipoteza 3: Płeć a wybór platformy
 
@@ -729,6 +734,8 @@ Comparison	Z	P.unadj	P.adj
 Graduate - High School	-6.183	0.000	0.000
 Graduate - Undergraduate	-2.155	0.031	0.094
 High School - Undergraduate	5.372	0.000	0.000
+**Wnioski**
+Wartość p jest niższa od progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje zależność między płcią a wyborem dominującej platformy społecznościowej. Można zauważyć, że kobiety wybierają częściej platformy skupiające się na treściach wizualnych, a mężczyźni preferują platformy o charakterze informacyjnym.
 
 ## 5.5 Hipoteza 5: Deficyt snu a czas online
 
@@ -762,6 +769,8 @@ Statystyka	Wartość
 Rho Spearmana	-0.814
 Wartość p	<2e-16
 N	705
+**Wnioski**
+Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Związek między czasem spędzonym w mediach społecznościowych a długością snu jest statystycznie istotny. Współczynnik korelacji Spearmana wynosi -0,814 co wskazuje na silną korelację ujemną, czyli im więcej czasu studenci spędzają w mediach społęcznościowych, tym mniej godzin przeznaczają na sen.
 
 ## 5.6 Hipoteza 6: Uzależnienie a wpływ na wyniki w nauce według wieku
 
@@ -858,26 +867,45 @@ Grupa wiekowa	Średnia	Mediana	N
 18-20 lat	7.58	8.0	234
 21-23 lata	7.31	7.0	205
 24+ lat	7.64	7.5	1
+**Wnioski**
+Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej, istnieje statystycznie istotna różnica poziomu uzależnienia między osobami, które deklarują negatywny wpływ mediów społecznościowych w nauce, a tymi, które go nie zauważają. Można także zauważyć, że najbardziej narażoną grupą są najmłodsi studenci.
 
 # 6. Podsumowanie i Wnioski
 Przeprowadzenie analizy na ponad 700 studentów pozwoliło na zrozumienie 
 mechanizmów korzystania z mediów społecznościowych oraz ich wpływu na życie 
 studentów.
+
+
 Z analizy wynikają następujące wnioski:
- - Występuje silna korelacja między czasem spędzonych w mediach 
- społecznościowych a ich dobrostanem; Wykazano silną ujemną korelację rang 
- Spearmana między czasem użytkowania a zdrowiem psychicznym. Im więcej czasu 
- studenci spędzają w mediach tym niżej oceniają swoje zdrowie psychiczne.
- - Zaobserwowano negatywny wpływ na wyniki w nauce przy dłuższym czasie 
- korzystania z mediów społecznościowych.
- - Wraz z postępem edukacji spada czas spędzony w mediach społecznościowych jak 
- i wyniki uzależnienia.
- - Nie zaobserwowano istotnej różnicy w poziomie uzależnienia w rozróżnieniu 
- płci, jednak wypływa ona na wybór platformy, kobiety częściej wybierają 
- Instagrama i Tiktoka, mężczyźni natomiast Facebooka i YouTube.
- - Wykazano wzrost konfliktów wraz ze wzrostem poziomu uzależnienia.
- Podsumuwując wyniki analizy można stwierdzić, że media społęcznościowe są dużym
- wyzwaniem dla życia młodych dorosłych. Silnie wpływają na ich sen, zdrowie 
- psychiczne jak i wyniki w nauce co też świadczy o wyzwaniu dla obecnej edukacji.
+
+- Badana grupa jest zróżnicowana pod względem pochodzenia, najlczniejsza grupa pochodzi z Indii i USA
+
+- Średni czas spędzany w mediach społecznościowych wynosi około 5 godzin, co zajmuje dużą część doby.
+
+
+- Blisko 30% studentów należy do grupy wysokiego ryzyka.
+
+
+- Występuje silna korelacja między czasem spędzonych w mediach 
+społecznościowych a ich dobrostanem; Wykazano silną ujemną korelację rang 
+Spearmana między czasem użytkowania a zdrowiem psychicznym. Im więcej czasu studenci spędzają w mediach tym niżej oceniają swoje zdrowie psychiczne.
+
+
+- Zaobserwowano negatywny wpływ na wyniki w nauce przy dłuższym czasie 
+korzystania z mediów społecznościowych.
+
+
+- Wraz z postępem edukacji spada czas spędzony w mediach społecznościowych jak i wyniki uzależnienia.
+
+
+- Nie zaobserwowano istotnej różnicy w poziomie uzależnienia w rozróżnieniu 
+płci, jednak wypływa ona na wybór platformy, kobiety częściej wybierają 
+Instagrama i Tiktoka, mężczyźni natomiast Facebooka i YouTube.
+
+
+- Wykazano wzrost konfliktów wraz ze wzrostem poziomu uzależnienia.
+
+
+Podsumuwując wyniki analizy można stwierdzić, że media społęcznościowe są dużym wyzwaniem dla życia młodych dorosłych. Silnie wpływają na ich sen, zdrowie psychiczne jak i wyniki w nauce co też świadczy o wyzwaniu dla obecnej edukacji.
 
 
