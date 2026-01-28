@@ -6,13 +6,16 @@ author: "Marta Kaczmarkiewicz, Natalia Gaik, Michał Biesiadowski"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
-    theme: cosmo          # Profesjonalny, czysty motyw (widoczny w Twoich plikach)
-    highlight: tango      # Czytelne kolorowanie składni kodu
-    toc: true             # Spis treści
-    toc_float: true       # Spis treści zawsze widoczny z boku (bardzo wygodne!)
-    number_sections: true # Automatyczna numeracja sekcji (1., 1.1 itd.)
-    code_folding: hide    # Ukrywa kod, ale pozwala go rozwinąć (klucz do profesjonalizmu)
-    df_print: paged       # Ładne, interaktywne tabele zamiast surowego tekstu
+    theme: flatly          
+    highlight: kate     
+    toc: true             
+    toc_float: true       
+    number_sections: true 
+    code_folding: hide    
+    df_print: paged   
+    fontsize: 11pt
+    smooth_scroll: true
+    anchor_sections: true    
 ---
 
 ```{r setup, include=FALSE}
@@ -81,9 +84,9 @@ if (!dir.exists(user_lib)) {
 # Ładowanie niezbędnych pakietów (instaluje jeśli brakują)
 install_if_needed <- function(pkg) {
   if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
-    install.packages(pkg, dependencies = TRUE, repos = "https://cran.rstudio.com/", 
-                     lib = user_lib, type = "win.binary")
-    library(pkg, character.only = TRUE)
+  install.packages(pkg, dependencies = TRUE,
+                   repos = "https://cran.rstudio.com/")
+  library(pkg, character.only = TRUE)
   }
 }
 
@@ -129,7 +132,11 @@ braki <- dane %>%
 # Wyświetlenie tabeli braków
 braki %>%
   kbl(caption = "Liczba braków danych w poszczególnych kolumnach") %>%
-  kable_styling(full_width = F)
+  kable_styling(full_width = FALSE) %>%
+  scroll_box(
+    width = "70%",
+    height = "300px"
+  )
 
 # Całkowita liczba braków w zbiorze
 suma_brakow <- sum(is.na(dane))
@@ -174,7 +181,15 @@ dane_clean <- dane %>%
 # Podgląd przetworzonych danych
 head(dane_clean) %>%
   kbl(caption = "Fragment przetworzonego zbioru danych") %>%
-  kable_styling()
+  kable_styling(
+    full_width = FALSE,
+    position = "center",
+    bootstrap_options = c("striped", "hover", "condensed")
+  ) %>%
+  scroll_box(
+    width = "90%",
+    height = "auto"
+  )
 ```
 ## 2.3 Walidacja spójności logicznej
 ```{r logical-validation}
@@ -240,10 +255,25 @@ demografia <- dane_clean %>%
   ungroup() %>%
   arrange(Zmienna, desc(n))
 
+demografia <- dane_clean %>%
+  select(Plec, Poziom_akademicki, Kraj) %>%
+  gather(key = "Zmienna", value = "Kategoria") %>%
+  filter(Zmienna == "Kraj") %>%          # ← TO JEST KLUCZ
+  count(Zmienna, Kategoria) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1)) %>%
+  arrange(desc(n))
+
 print(demografia)
 demografia %>%
-   kbl(caption = "Struktura demograficzna próby") %>%
-  kable_styling(full_width = F)
+  kbl(caption = "Struktura demograficzna próby") %>%
+  kable_styling(
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  scroll_box(
+    width = "70%",
+    height = "400px"
+  )
 ```
 Njawięcej danych pochodzi z Indii, jest to 7,5% próby. Następna najliczniejsza grupa pochodzi z USA (ponad 5%)
 
@@ -254,6 +284,7 @@ dane_clean %>%
   select(Wiek, Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, Wynik_uzaleznienia) %>%
   summary()
 ```
+Próba obejmuje osoby w wieku od 18 do 24 lat, przy czym średni wiek wynosi około 20,7 roku, a mediana 21 lat. Średni czas użytkowania wynosi niespełna 5 jednostek, przy umiarkowanym zróżnicowaniu obserwacji. Badani śpią przeciętnie około 6,9 godziny na dobę, a połowa próby mieści się w przedziale od 6 do 7,7 godziny snu. Samoocena zdrowia psychicznego kształtuje się na umiarkowanie dobrym poziomie, ze średnią równą 6,2 i medianą 6 punktów. Wynik uzależnienia ma średnią wartość około 6,4, co wskazuje na przeciętny poziom nasilenia tego zjawiska w badanej grupie.
 
 ## 3.2 Analiza czasu użytkowania mediów społecznościowych
 
@@ -292,7 +323,7 @@ dane_grupy %>%
       col.names = c("Grupa czasu", "Liczebność (n)", "Udział (%)")) %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
-Większość studentów zalicza się do grupy z średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
+Większość studentów zalicza się do grupy ze średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
 
 ### 3.2.3 Najpopularniejsze platformy
 ```{r najpopularniejsze-platformy}
@@ -303,7 +334,14 @@ dane_clean %>%
   mutate(Procent = round(n / sum(n) * 100, 1))%>%
   kbl(caption = "Ranking najczęściej używanych platform mediów społecznościowych",
       col.names = c("Platforma", "Liczba użytkowników (n)", "Udział (%)")) %>%
-  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = c("striped", "hover")
+  ) %>%
+  scroll_box(
+    width = "70%",
+    height = "350px"
+  )
 ```
 Najpopularniejszą platformą jest Instagram, z którego korzysta 35,3% studentów w próbie, następnie TikTok (21,8%) i Facebook (17,4%).
 
@@ -579,12 +617,6 @@ tibble(
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
-**Wyniki**
-Wyniki testu korelacji rang Spearmana
-Statystyka	Wartość
-Rho Spearmana	-0.802
-Wartość p	<2e-16
-N	705
 **Wnioski**
 Wartość p jest znacznie pozniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje statystyczna zależność między czasem spędzonym w mediach społecznościowych a oceną zdrowia psychicznego.
 Współczynnik korelacji rang Spearmana wynosi -0,802, co wskazuje na silną ujemną korelację. Oznacza to, że wraz ze wzrostem liczby godzin spędzanych w mediach społecznościowych, ocena zdrowia psychicznego wyraźnie spada.
@@ -625,16 +657,6 @@ tibble(
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
-**Wyniki**
-Mediany poziomu uzależnienia według płci
-Grupa	Mediana	N
-Female	7	353
-Male	7	352
-
-Wyniki testu U Manna-Whitneya
-Statystyka	Wartość
-Statystyka W	66322.5
-Wartość p	0.113
 **Wnioski**
 Wartość p jest wyższa niż próg 0,05, oznacza to, że mamy brak podstaw do odrzucenia hipotezy zerowej. Różnica w poziomie uzależnienia między kobietami a mężczyznami nie jest istotna statystycznie. Wynik ten pokazuje, że płeć nie jest czynnikiem różniującym skłonność do uzależnienia od mediów społecznościowych.
 
@@ -662,13 +684,6 @@ tibble(
   kbl(caption = "Wyniki testu niezależności Chi-kwadrat") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
-
-**Wyniki**
-Wyniki testu niezależności Chi-kwadrat
-Statystyka	Wartość
-Chi-kwadrat	154.33
-df	11
-Wartość p	<2e-16
 
 ## 5.4 Hipoteza 4: Poziom edukacji a uzależnienie
 
@@ -715,25 +730,6 @@ if(test_h4$p.value < 0.05) {
 
 ```
 
-**Wyniki**
-Mediany poziomu uzależnienia według poziomu akademickiego
-Poziom akademicki	Mediana	N
-Graduate	7	325
-High School	8	27
-Undergraduate	7	35
-
-Wyniki testu Kruskala-Wallisa
-Statystyka	Wartość
-Chi-kwadrat	39.1
-df	2
-Wartość p	3.23e-09
-
-
-Testy post-hoc (Dunn) z korektą Bonferroniego
-Comparison	Z	P.unadj	P.adj
-Graduate - High School	-6.183	0.000	0.000
-Graduate - Undergraduate	-2.155	0.031	0.094
-High School - Undergraduate	5.372	0.000	0.000
 **Wnioski**
 Wartość p jest niższa od progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje zależność między płcią a wyborem dominującej platformy społecznościowej. Można zauważyć, że kobiety wybierają częściej platformy skupiające się na treściach wizualnych, a mężczyźni preferują platformy o charakterze informacyjnym.
 
@@ -763,12 +759,6 @@ tibble(
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
-**Wyniki**
-Wyniki testu korelacji rang Spearmana
-Statystyka	Wartość
-Rho Spearmana	-0.814
-Wartość p	<2e-16
-N	705
 **Wnioski**
 Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Związek między czasem spędzonym w mediach społecznościowych a długością snu jest statystycznie istotny. Współczynnik korelacji Spearmana wynosi -0,814 co wskazuje na silną korelację ujemną, czyli im więcej czasu studenci spędzają w mediach społęcznościowych, tym mniej godzin przeznaczają na sen.
 
@@ -843,30 +833,6 @@ dane_clean %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
-**Wyniki**
-Poziom uzależnienia według deklarowanego wpływu na wyniki w nauce
-Wpływ na wyniki	Mediana	Średnia	N
-No	5	4.60	252
-Yes	7	7.46	453
-
-
-Wyniki testu U Manna-Whitneya
-Statystyka	Wartość
-Statystyka W	360
-Wartość p	<2e-16
-
-Odsetek osób deklarujących negatywny wpływ mediów na naukę według wieku
-Grupa wiekowa	Liczba osób (Yes)	Procent grupy (%)
-18-20 lat	234	68.4
-21-23 lata	205	60.8
-24+ lat	14	53.8
-
-
-Poziom uzależnienia wśród osób deklarujących wpływ na naukę - według wieku
-Grupa wiekowa	Średnia	Mediana	N
-18-20 lat	7.58	8.0	234
-21-23 lata	7.31	7.0	205
-24+ lat	7.64	7.5	1
 **Wnioski**
 Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej, istnieje statystycznie istotna różnica poziomu uzależnienia między osobami, które deklarują negatywny wpływ mediów społecznościowych w nauce, a tymi, które go nie zauważają. Można także zauważyć, że najbardziej narażoną grupą są najmłodsi studenci.
 
