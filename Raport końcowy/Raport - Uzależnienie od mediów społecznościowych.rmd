@@ -577,7 +577,6 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -621,7 +620,6 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -658,7 +656,6 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu niezależności Chi-kwadrat") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -711,7 +708,6 @@ if(test_h4$p.value < 0.05) {
     kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 }
 
-  ## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -758,7 +754,6 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -801,8 +796,6 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
-## (Wykres usunięty)
 
 # Analiza według grup wiekowych
 dane_clean <- dane_clean %>%
