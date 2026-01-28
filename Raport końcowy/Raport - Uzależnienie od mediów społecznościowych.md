@@ -1,0 +1,1378 @@
+---
+---
+---
+title: "Analiza Uzależnienia Studentów od Mediów Społecznościowych"
+author: "Marta Kaczmarkiewicz, Natalia Gaik, Michał Biesiadowski"
+date: "28 styczeń 2026"
+output:
+  html_document:
+    theme: cosmo          # Profesjonalny, czysty motyw (widoczny w Twoich plikach)
+    highlight: tango      # Czytelne kolorowanie składni kodu
+    toc: true             # Spis treści
+    toc_float: true       # Spis treści zawsze widoczny z boku (bardzo wygodne!)
+    number_sections: true # Automatyczna numeracja sekcji (1., 1.1 itd.)
+    code_folding: hide    # Ukrywa kod, ale pozwala go rozwinąć (klucz do profesjonalizmu)
+    df_print: paged       # Ładne, interaktywne tabele zamiast surowego tekstu
+---
+
+
+
+# 1. Wprowadzenie
+
+## 1.1 Cel i zakres analizy
+Celem niniejszego projektu jest zbadanie relacji między sposobem korzystania z mediów społecznościowych a subiektywnym dobrostanem studentów. 
+W dobie powszechnej cyfryzacji, zrozumienie cyfrowych nawyków młodych dorosłych staje się kluczowe dla identyfikacji potencjalnych ryzyk związanych z nadużywaniem 
+technologii. W badaniu koncentrujemy się na weryfikacji, czy czas spędzany online oraz rodzaj wybieranej platformy współwystępują z niższą oceną zdrowia psychicznego,
+gorszą jakością snu oraz poczuciem uzależnienia.
+
+## 1.2 Charakterystyka danych
+Analiza została przeprowadzona na zbiorze danych obejmującym 705 obserwacji. Dane mają charakter deklaratywny i zostały zebrane metodą ankietową. 
+Zmienne wykorzystane w badaniu obejmują:
+
+Zmienne demograficzne: Wiek, płeć, poziom studiów.
+
+Zmienne behawioralne:
+
+Avg_Daily_Usage_Hours (Czas_h): Średnia liczba godzin spędzanych dziennie w mediach społecznościowych.
+
+Most_Used_Platform (Platforma): Najczęściej wybierana aplikacja społecznościowa.
+
+Conflicts_Over_Social_Media (Konflikty): Liczba sytuacji konfliktowych z otoczeniem, których źródłem było korzystanie z mediów społecznościowych.
+
+Zmienne dobrostanu:
+
+Mental_Health_Score (Zdrowie_psychiczne): Subiektywna ocena własnego zdrowia psychicznego w skali 1-10 (gdzie 10 oznacza samopoczucie doskonałe).
+
+Addicted_Score (Wynik_uzaleznienia): Subiektywna ocena stopnia uzależnienia od mediów w skali 1-5.
+
+Sleep_Hours_Per_Night (Godziny_snu): Deklarowana średnia długość snu.
+
+
+**Pytania badawcze:**
+1. Czy istnieje istotna statystycznie zależność między czasem spędzanym w mediach społecznościowych
+ a subiektywną oceną zdrowia psychicznego?
+
+2. Czy płeć różnicuje poziom uzależnienia od mediów społecznościowych oraz preferencje dotyczące 
+wyboru platformy?
+
+3. Czy studenci na niższych szczeblach edukacji (High School) wykazują wyższy poziom uzależnienia 
+niż studenci studiów magisterskich (Academic_level)?
+
+4. W jakim stopniu deficyt snu jest powiązany z intensywnością korzystania z social mediów?
+
+5. Czy wyższy poziom uzależnienia od mediów społecznościowych wiąże się z częstszym deklarowaniem 
+negatywnego wpływu tych mediów na wyniki w nauce?
+
+6. Czy osoby deklarujące negatywny wpływ mediów społecznościowych na wyniki w nauce charakteryzują się 
+wyższym poziomem uzależnienia? Które grupy wiekowe są najbardziej zagrożone tym zjawiskiem?
+
+## 1.3 Przygotowanie środowiska
+Do przetwarzania i wizualizacji danych wykorzystano środowisko R oraz następujących bibliotek:
+
+``` r
+# Konfiguracja osobistej biblioteki pakietów (rozwiązuje problem uprawnień)
+user_lib <- Sys.getenv("R_LIBS_USER")
+if (!dir.exists(user_lib)) {
+  dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
+}
+.libPaths(c(user_lib, .libPaths()))
+
+# Ładowanie niezbędnych pakietów (instaluje jeśli brakują)
+install_if_needed <- function(pkg) {
+  if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE, repos = "https://cran.rstudio.com/", 
+                     lib = user_lib, type = "win.binary")
+    library(pkg, character.only = TRUE)
+  }
+}
+
+# Pakiety używane w dokumencie
+pkgs <- c(
+  "tidyverse",
+  "corrplot",
+  "knitr",
+  "kableExtra",
+  "ggthemes",
+  "summarytools",
+  "psych",
+  "classInt",
+  "ggpubr",
+  "frequency",
+  "ggstatsplot",
+  "FSA",
+  "nortest"
+)
+
+# Instalacja i załadowanie wszystkich pakietów
+invisible(lapply(pkgs, install_if_needed))
+
+# Ustawienie estetyki wykresów
+theme_set(theme_minimal())
+```
+
+``` r
+# Wczytanie danych
+dane <- read_csv("Students Social Media Addiction.csv")
+```
+
+```
+## Error:
+## ! 'Students Social Media Addiction.csv' does not exist in current working directory ('C:/Users/biesi/Desktop/studia/Analiza danych w R/proba/Raport końcowy').
+```
+
+``` r
+# Podstawowy przegląd
+glimpse(dane)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+# 2. Przygotowanie danych
+
+## 2.1 Sprawdzenie kompletności danych
+
+``` r
+# Sprawdzenie brakujących wartości w każdej kolumnie
+braki <- dane %>%
+  summarise(across(everything(), ~sum(is.na(.))))
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+# Wyświetlenie tabeli braków
+braki %>%
+  kbl(caption = "Liczba braków danych w poszczególnych kolumnach") %>%
+  kable_styling(full_width = F)
+```
+
+```
+## Error:
+## ! object 'braki' not found
+```
+
+``` r
+# Całkowita liczba braków w zbiorze
+suma_brakow <- sum(is.na(dane))
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+procent_brakow <- (suma_brakow / (nrow(dane) * ncol(dane))) * 100
+```
+
+```
+## Error:
+## ! object 'suma_brakow' not found
+```
+## 2.2 Transformacja i tłumaczenie
+
+``` r
+dane_clean <- dane %>%
+  rename(
+    ID = Student_ID,
+    Wiek = Age,
+    Plec = Gender,
+    Poziom_akademicki = Academic_Level,
+    Kraj = Country,
+    Sredni_Czas_Użytkowania = Avg_Daily_Usage_Hours,
+    Najczęściej_używana_platforma = Most_Used_Platform,
+    Wplyw_na_wyniki = Affects_Academic_Performance,
+    Godziny_snu = Sleep_Hours_Per_Night,
+    Ocena_zdrowia_psychicznego = Mental_Health_Score,
+    Konflikty_w_social_mediach = Conflicts_Over_Social_Media,
+    Wynik_uzaleznienia = Addicted_Score
+  ) %>%
+  mutate(
+    # Konwersja na faktory
+    f.Plec = as.factor(Plec),
+    f.Platforma = as.factor(Najczęściej_używana_platforma), # Poprawione odwołanie do nowej nazwy
+    f.Wplyw_na_wyniki = as.factor(Wplyw_na_wyniki),
+    
+    # Grupy użytkowników (Feature Engineering)
+    Grupa_Czasu_Uzytkowania = case_when(
+      Sredni_Czas_Użytkowania <= 2 ~ "Niski (0-2h)", # Poprawione odwołanie do nowej nazwy
+      Sredni_Czas_Użytkowania <= 5 ~ "Średni (2-5h)",
+      TRUE ~ "Wysoki (>5h)"
+    ),
+    f.Grupa_Czasu_Uzytkowania = factor(Grupa_Czasu_Uzytkowania, 
+                                       levels = c("Niski (0-2h)", "Średni (2-5h)", "Wysoki (>5h)")),
+    
+    # Deficyt snu
+    Deficyt_snu = 7 - Godziny_snu
+  )
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+# Podgląd przetworzonych danych
+head(dane_clean) %>%
+  kbl(caption = "Fragment przetworzonego zbioru danych") %>%
+  kable_styling()
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+## 2.3 Walidacja spójności logicznej
+
+``` r
+# Definicja kryteriów i zliczanie przypadków
+wyniki_weryfikacji <- dane_clean %>%
+  summarise(
+    `Ocena zdrowia = 10 przy śnie < 4h` = sum(Ocena_zdrowia_psychicznego == 10 & Godziny_snu < 4, na.rm = TRUE),
+    `Suma czasu (Media + Sen) > 22h` = sum(Sredni_Czas_Użytkowania + Godziny_snu > 22, na.rm = TRUE),
+    `Wiek < 18 lat na poziomie Graduate` = sum(Wiek < 18 & Poziom_akademicki == "Graduate", na.rm = TRUE),
+    `Maksymalne uzależnienie (10) bez wpływu na naukę` = sum(Wynik_uzaleznienia == 10 & Wplyw_na_wyniki == "No", na.rm = TRUE),
+    `Maksymalne uzależnienie (10) bez konfliktów` = sum(Wynik_uzaleznienia == 10 & Konflikty_w_social_mediach == 0, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "Kryterium weryfikacji", values_to = "Liczba przypadków")
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Uzasadnienie
+tabela_opisowa <- tibble(
+  `Kryterium weryfikacji` = c(
+    "Ocena zdrowia = 10 przy śnie < 4h",
+    "Suma czasu (Media + Sen) > 22h",
+    "Wiek < 18 lat na poziomie Graduate",
+    "Maksymalne uzależnienie (10) bez wpływu na naukę",
+    "Maksymalne uzależnienie (10) bez konfliktów"
+  ),
+  `Dlaczego to sprawdzamy?` = c(
+    "Biologicznie trudne do utrzymania.",
+    "Brak czasu na fizjologiczne potrzeby i naukę.",
+    "Mało prawdopodobne osiągnięcie poziomu magisterskiego przed 18 r.ż.",
+    "Skrajne uzależnienie zazwyczaj wpływa na wyniki.",
+    "Silne uzależnienie zazwyczaj generuje spory z otoczeniem."
+  )
+)
+
+# Połączenie i wyświetlenie tabeli
+left_join(tabela_opisowa, wyniki_weryfikacji, by = "Kryterium weryfikacji") %>%
+  kbl(caption = "Zestawienie potencjalnych niespójności w danych") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover")) %>%
+  column_spec(3, bold = TRUE, color = ifelse(wyniki_weryfikacji$`Liczba przypadków` > 0, "red", "green"))
+```
+
+```
+## Error:
+## ! object 'wyniki_weryfikacji' not found
+```
+# 3. Analiza Opisowa
+
+W rozdziale przedstawiono strukturę próby i rozkłady podstawowych zmiennych. Materiał ma charakter eksploracyjny
+służy identyfikacji wstępnych wzorców przed analizami wnioskowania.
+
+## 3.1 Charakterystyka próby
+
+
+### 3.1.1 Struktura demograficzna
+
+``` r
+# Przygotowanie danych
+dane$Gender <- as.factor(dane$Gender)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+dane$Academic_Level <- factor(dane$Academic_Level, 
+                             levels = c("High School", "Undergraduate", "Graduate"), 
+                              ordered = TRUE)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+dane$Most_Used_Platform <- as.factor(dane$Most_Used_Platform)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+dane$Affects_Academic_Performance <- as.factor(dane$Affects_Academic_Performance)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+# Tabela liczebności i procentów dla zmiennych demograficznych
+demografia <- dane_clean %>%
+  select(Plec, Poziom_akademicki, Kraj) %>%
+  gather(key = "Zmienna", value = "Kategoria") %>%
+  count(Zmienna, Kategoria) %>%
+  group_by(Zmienna) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  arrange(Zmienna, desc(n))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+print(demografia)
+```
+
+```
+## Error:
+## ! object 'demografia' not found
+```
+
+``` r
+demografia %>%
+   kbl(caption = "Struktura demograficzna próby") %>%
+  kable_styling(full_width = F)
+```
+
+```
+## Error:
+## ! object 'demografia' not found
+```
+Njawięcej danych pochodzi z Indii, jest to 7,5% próby. Następna najliczniejsza grupa pochodzi z USA (ponad 5%)
+
+### 3.1.2 Podstawowe statystyki zmiennych ciągłych
+
+``` r
+# Wybór zmiennych numerycznych i obliczenie statystyk
+dane_clean %>%
+  select(Wiek, Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, Wynik_uzaleznienia) %>%
+  summary()
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+## 3.2 Analiza czasu użytkowania mediów społecznościowych
+
+
+### 3.2.1 Statystyki czasu użytkowania
+
+``` r
+# Szczegółowe miary położenia dla czasu
+dane_clean %>%
+  summarise(
+    Srednia = mean(Sredni_Czas_Użytkowania),
+    Mediana = median(Sredni_Czas_Użytkowania),
+    Odchylenie_Std = sd(Sredni_Czas_Użytkowania),
+    Min = min(Sredni_Czas_Użytkowania),
+    Max = max(Sredni_Czas_Użytkowania),
+    Q1 = quantile(Sredni_Czas_Użytkowania, 0.25),
+    Q3 = quantile(Sredni_Czas_Użytkowania, 0.75)
+  ) %>%
+  kbl(caption = "Charakterystyki opisowe czasu użytkowania mediów społecznościowych", digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+descr(dane$Avg_Daily_Usage_Hours)
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+
+``` r
+ggdensity(dane, x = "Avg_Daily_Usage_Hours", fill = "orange", alpha = 0.4) +
+   labs(title = "Gęstość rozkładu dziennego czasu użytkowania", x = "Godziny na dobę")
+```
+
+```
+## Error:
+## ! object 'dane' not found
+```
+Średnia długość użytkowania wynosi 4,92, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
+
+### 3.2.2 Rozkład czasu według kategorii
+
+``` r
+# Analiza stworzonych grup (Niski/Średni/Wysoki)
+dane_grupy <- dane_clean %>%
+ count(f.Grupa_Czasu_Uzytkowania) %>%
+   mutate(Udzial_procentowy = round(n / sum(n) * 100, 2))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+dane_grupy %>%
+  kbl(caption = "Struktura badanej próby według grup czasu użytkowania", 
+      col.names = c("Grupa czasu", "Liczebność (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_grupy' not found
+```
+Większość studentów zalicza się do grupy z średnim czasem użytkowania, czyli 2-5 godzin dziennie, jednak dużo liczniejsza jest grupa z wynikiem "wysoki" niż z wynikiem "niski".
+
+### 3.2.3 Najpopularniejsze platformy
+
+``` r
+# Ranking platform
+dane_clean %>%
+  count(Najczęściej_używana_platforma) %>%
+  arrange(desc(n)) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1))%>%
+  kbl(caption = "Ranking najczęściej używanych platform mediów społecznościowych",
+      col.names = c("Platforma", "Liczba użytkowników (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Najpopularniejszą platformą jest Instagram, z którego korzysta 35,3% studentów w próbie, następnie TikTok (21,8%) i Facebook (17,4%).
+
+## 3.3 Analiza poziomu uzależnienia
+
+
+### 3.3.1 Rozkład wyniku uzależnienia
+
+``` r
+# Statystyki dla Wynik_uzaleznienia
+dane_clean %>%
+  summarise(
+    Srednia_Uzaleznienie = mean(Wynik_uzaleznienia),
+    Mediana = median(Wynik_uzaleznienia),
+    SD = sd(Wynik_uzaleznienia)
+  )%>%
+  kbl(caption = "Statystyki opisowe poziomu uzależnienia studentów",
+      col.names = c("Średnia", "Mediana", "Odchylenie standardowe"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Średni poziom uzależnienia wynosi 6,44, a odchylenie wynosi 1,59.
+
+### 3.3.2 Poziomy uzależnienia według kategorii
+
+``` r
+# Tworzymy proste kategorie uzależnienia do tabeli
+dane_clean %>%
+  mutate(Kat_Uzaleznienia = case_when(
+    Wynik_uzaleznienia <= 3 ~ "Niskie",
+    Wynik_uzaleznienia <= 7 ~ "Umiarkowane",
+    TRUE ~ "Wysokie"
+  )) %>%
+  count(Kat_Uzaleznienia) %>%
+  mutate(Procent = round(n / sum(n) * 100, 1)) %>%
+  arrange(desc(n))%>%
+  kbl(caption = "Liczba studentów według poziomu uzależnienia",
+      col.names = c("Kategoria uzależnienia", "Liczebność (n)", "Udział (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Prawie 70% studentów wykazuje umiarkowany poziom uzależnienia, a niski poziom wykazuje tylko 2,4%, pozostałe 28% wykazuje wysoki poziom uzależnienia.
+
+## 3.4 Analiza według płci
+
+
+
+``` r
+# Porównanie kobiet i mężczyzn w kluczowych aspektach
+dane_clean %>%
+  group_by(f.Plec) %>%
+  summarise(
+    N = n(),
+    Sredni_Czas = mean(Sredni_Czas_Użytkowania),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia),
+    Srednie_Zdrowie = mean(Ocena_zdrowia_psychicznego)
+  )%>%
+  kbl(caption = "Porównanie wskaźników aktywności i dobrostanu według płci",
+      col.names = c("Płeć", "Liczebność (n)", "Śr. czas użytkowania", "Śr. wynik uzależnienia", "Śr. zdrowie psychiczne"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Kobiety cechują się nieznacznie większym średnim czasem w mediach społecznościowych, co też skutkuje większym uzależnieniem, jednak to mężczyźni wykazują gorsze zdrowie psychiczne.
+
+## 3.5 Analiza według poziomu akademickiego
+
+
+
+``` r
+# Czy poziom edukacyjny ma znaczenie?
+dane_clean %>%
+  group_by(Poziom_akademicki) %>%
+  summarise(
+    Sredni_Czas = mean(Sredni_Czas_Użytkowania),
+    Sredni_Sen = mean(Godziny_snu),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
+  ) %>%
+  arrange(desc(Sredni_Czas))%>%
+  kbl(caption = "Charakterystyki aktywności w mediach społecznościowych i dobrostanu według poziomu akademickiego",
+      col.names = c("Poziom akademicki", "Śr. czas użytkowania", "Śr. czas snu", "Śr. wynik uzależnienia"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Studenci "High School" spędzają najwięcej czasu w mediach społecznościowych i wykazują najwyższy poziom uzależnienia, podczas gdy studenci "Graduate" mają najniższe wartości w obu tych aspektach.
+
+## 3.6 Zdrowie psychiczne i sen
+
+
+### 3.6.1 Jakość zdrowia psychicznego
+
+``` r
+# Podsumowanie oceny zdrowia psychicznego
+dane_clean %>%
+  summarise(
+    Srednia = mean(Ocena_zdrowia_psychicznego),
+    Mediana = median(Ocena_zdrowia_psychicznego),
+    Najnizsza = min(Ocena_zdrowia_psychicznego),
+    Najwyzsza = max(Ocena_zdrowia_psychicznego)
+  )%>%
+  kbl(caption = "Statystyki opisowe oceny zdrowia psychicznego studentów",
+      col.names = c("Średnia ocena", "Mediana", "Ocena minimalna", "Ocena maksymalna"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Średnia ocena zdrowia psychicznego to 6,23 na 10, z czego najniższa wynosi 4 a najwyższa 9.
+
+### 3.6.2 Jakość snu
+
+``` r
+# Analiza snu i deficytów
+stats_snu <- dane_clean %>%
+  summarise(
+    Srednia_Godzin = mean(Godziny_snu),
+    Liczba_z_Deficytem = sum(Godziny_snu < 7), # Deficyt poniżej 7h
+    Procent_z_Deficytem = mean(Godziny_snu < 7) * 100
+  )%>%
+  kbl(caption = "Analiza jakości snu",
+      col.names = c("Średnia liczba godzin", "Liczba osób z deficytem (<7h)", "Procent osób z deficytem (%)"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+print(stats_snu)
+```
+
+```
+## Error:
+## ! object 'stats_snu' not found
+```
+Średnia długość snu wynosi 6,87 godzin, jednak aż 50% wykazuje deficyt snu , czyli poniżej 7 godzin.
+
+## 3.7 Wpływ na wyniki akademickie
+
+
+
+``` r
+# Jak studenci oceniają wpływ social mediów na swoje oceny?
+dane_clean %>%
+  group_by(f.Wplyw_na_wyniki) %>%
+  summarise(
+    Liczba = n(),
+    Sredni_Czas_Uzytkowania = mean(Sredni_Czas_Użytkowania),
+    Srednie_Uzaleznienie = mean(Wynik_uzaleznienia)
+  ) %>%
+  kbl(caption = "Aktywność w mediach społecznościowych a deklarowany wpływ na wyniki w nauce",
+      col.names = c("Czy wpływa na wyniki?", "Liczebność (n)", "Śr. czas użytkowania", "Śr. wynik uzależnienia"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Studenci, którzy twierdzą, że media społecznościowe mają wypływ na ich wyniki w nauce, spędzają średnio o 2 godzin więcej na platformach jak i wykazują większe uzależnienie, niż ci którzy nie wykazali wpływu na naukę
+
+## 3.8 Konflikty związane z mediami społecznościowymi
+
+
+
+``` r
+# Czy konflikty wiążą się z uzależnieniem?
+dane_clean %>%
+  group_by(Konflikty_w_social_mediach) %>%
+  summarise(
+    Sredni_Wynik_Uzaleznienia = mean(Wynik_uzaleznienia),
+    Licznosc = n()
+  )%>%
+  kbl(caption = "Związek między konfliktami a średnim poziomem uzależnienia",
+      col.names = c("Liczba konfliktów", "Śr. wynik uzależnienia", "Liczebność (n)"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Prosta korelacja
+kor_konflikty <- cor(dane_clean$Konflikty_w_social_mediach, dane_clean$Wynik_uzaleznienia)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+print(paste("Korelacja konfliktów z uzależnieniem wynosi:", round(kor_konflikty, 2)))
+```
+
+```
+## Error:
+## ! object 'kor_konflikty' not found
+```
+Zachodzi korelacja między wynikiem uzależnienia a występowaniem konfliktów.
+
+## 3.9 Korelacje między zmiennymi
+
+
+``` r
+# Wybór tylko zmiennych numerycznych do macierzy
+zmienne_numeryczne <- dane_clean %>%
+  select(Wiek, Sredni_Czas_Użytkowania, Godziny_snu, Ocena_zdrowia_psychicznego, 
+         Konflikty_w_social_mediach, Wynik_uzaleznienia)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Obliczenie korelacji
+M <- cor(zmienne_numeryczne)
+```
+
+```
+## Error:
+## ! object 'zmienne_numeryczne' not found
+```
+
+``` r
+# Wyświetlenie macierzy korelacji
+print(M)
+```
+
+```
+## Error:
+## ! object 'M' not found
+```
+
+``` r
+M %>%
+   kbl(caption = "Macierz korelacji Pearsona dla zmiennych ilościowych", digits = 2) %>%
+   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'M' not found
+```
+
+``` r
+ tabela_wiek_kor <- as.data.frame(M[, 1])
+```
+
+```
+## Error:
+## ! object 'M' not found
+```
+
+``` r
+ colnames(tabela_wiek_kor) <- "Współczynnik korelacji (r)"
+```
+
+```
+## Error:
+## ! object 'tabela_wiek_kor' not found
+```
+
+``` r
+ tabela_wiek_kor %>%
+   kbl(caption = "Korelacja wieku z pozostałymi cechami ilościowymi", digits = 2) %>%
+   kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+```
+## Error:
+## ! object 'tabela_wiek_kor' not found
+```
+Najmniejsze korelacje występują przy zmiennej "wiek". Najwyższa korelacja zachodzi dla wyniku uzależnienia i występowaniu konfliktów. Mocno na siebie oddziałują również czas użytkowania i ocena zdrowia psychicznego.
+
+# 4. Wizualizacja Danych
+
+W tej części przedstawiono graficzną analizę rozkładów zmiennych oraz zależności między nimi.
+
+## 4.1 Rozkład czasu spędzanego w mediach społecznościowych
+
+
+``` r
+ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania)) +
+  geom_histogram(aes(y = ..density..),
+                 binwidth = 1,
+                 fill = "steelblue",
+                 color = "white",
+                 alpha = 0.8) +
+  geom_density(color = "red", size = 1) +
+  labs(title = "Rozkład czasu spędzanego w mediach społecznościowych",
+       x = "Liczba godzin dziennie",
+       y = "Gęstość") +
+  theme_minimal()
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Histogram przedstawia rozkład średniego czasu spędzanego dziennie w mediach społecznościowych. Największa koncentracja obserwacji występuje w przedziale około 4–6 godzin dziennie. Maksimum krzywej gęstości znajduje się w okolicach 5 godzin.Rozkład wykazuje asymetrię prawostronną, co oznacza, że część użytkowników spędza w mediach społecznościowych znacznie więcej czasu niż przeciętnie. W prawej części rozkładu widoczny jest „ogon” obejmujący wartości powyżej 7–8 godzin dziennie, które mogą świadczyć o intensywnym korzystaniu z mediów społecznościowych przez niewielką grupę respondentów. Z kolei nieliczne obserwacje poniżej 2–3 godzin dziennie sugerują, że relatywnie mała część badanych korzysta z mediów społecznościowych w ograniczonym zakresie. Ogólny kształt rozkładu wskazuje na umiarkowane zróżnicowanie czasu użytkowania, przy dominacji średnich wartości i stopniowym spadku częstości wraz ze wzrostem liczby godzin. Podsumowując, wykres pokazuje, że większość respondentów spędza w mediach społecznościowych kilka godzin dziennie, natomiast skrajnie niskie i bardzo wysokie wartości występują rzadziej, co potwierdza istnienie zróżnicowanych, lecz wyraźnie skoncentrowanych wzorców użytkowania.
+
+## 4.2 Poziom uzależnienia w zależności od platformy
+
+``` r
+ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platforma)) +
+  geom_boxplot(alpha = 0.7, outlier.colour = "red", outlier.shape = 1) +
+  labs(title = "Poziom uzależnienia wg najczęściej używanej platformy",
+       x = "Platforma",
+       y = "Wynik uzależnienia (1-10)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        legend.position = "none")
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
+
+## 4.3 Czas użytkowania a zdrowie psychiczne
+
+``` r
+ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychicznego)) +
+  geom_jitter(color = "darkgreen", alpha = 0.4, width = 0.2) + 
+  geom_smooth(method = "lm", color = "darkred", se = TRUE) +
+  labs(title = "Korelacja: Czas użytkowania mediów a ocena zdrowia psychicznego",
+       x = "Godziny spędzane dziennie",
+       y = "Ocena zdrowia psychicznego (1-10)") +
+  theme_minimal()
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
+
+## 4.4 Wybór platformy z podziałem na płeć
+
+``` r
+ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
+  geom_bar(position = "dodge", color = "black", alpha = 0.8) +
+  labs(title = "Wybór platformy społecznościowej w zależności od płci",
+       x = "Platforma",
+       y = "Liczba użytkowników",
+       fill = "Płeć") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
+
+# 5. Wnioskowanie statystyczne
+
+Przed przystąpieniem do testowania hipotez sprawdzono założenia o normalności rozkładów zmiennych ilościowych w grupach badawczych. Wykorzystano test Shapiro-Wilka. 
+Ze względu na znaczną liczebność próby (N=705) oraz wyniki testów (p < 0.05), odrzucono hipotezę o normalności rozkładów. W związku z tym w dalszej analizie zastosowano testy nieparametryczne.
+
+## 5.1 Hipoteza 1: Czas użytkowania a zdrowie psychiczne
+
+**Pytanie badawcze:** Czy istnieje związek pomiędzy ilością czasu spędzanego w mediach społecznościowych a subiektywną oceną zdrowia psychicznego?
+
+**Hipotezy:**
+H_0: Nie ma istotnej korelacji między czasem spędzanym w mediach a oceną zdrowia psychicznego.
+H_1: Istnieje istotna statystycznie korelacja między tymi zmiennymi.
+
+Do weryfikacji wykorzystano współczynnik korelacji rang Spearmana.
+
+
+``` r
+# Test korelacji rang Spearmana
+test_h1 <- cor.test(dane_clean$Sredni_Czas_Użytkowania, 
+                    dane_clean$Ocena_zdrowia_psychicznego,
+                    method = "spearman")
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Rho Spearmana", "Wartość p", "N"),
+  Wartość = c(round(test_h1$estimate, 3), 
+              format.pval(test_h1$p.value, digits = 3),
+              nrow(dane_clean))
+) %>%
+  kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h1' not found
+```
+
+``` r
+## (Wykres usunięty)
+```
+
+**Wyniki**
+Wyniki testu korelacji rang Spearmana
+Statystyka	Wartość
+Rho Spearmana	-0.802
+Wartość p	<2e-16
+N	705
+
+## 5.2 Hipoteza 2: Płeć a poziom uzależnienia
+
+**Pytanie badawcze:** Czy płeć różnicuje poziom uzależnienia od mediów społecznościowych?
+
+**Hipotezy:**
+H_0: Nie ma istotnych różnic w poziomie uzależnienia między kobietami a mężczyznami.
+H_1: Występują istotne różnice w poziomie uzależnienia między kobietami a mężczyznami. 
+
+Zastosowano test U Manna-Whitneya (Wilcoxona dla dwóch prób niezależnych).
+
+
+``` r
+# Test U Manna-Whitneya
+test_h2 <- wilcox.test(Wynik_uzaleznienia ~ f.Plec, data = dane_clean)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Mediany w grupach
+mediany <- dane_clean %>%
+  group_by(f.Plec) %>%
+  summarise(Mediana = median(Wynik_uzaleznienia),
+            N = n())
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+tibble(
+  Grupa = mediany$f.Plec,
+  Mediana = mediany$Mediana,
+  N = mediany$N
+) %>%
+  kbl(caption = "Mediany poziomu uzależnienia według płci") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'mediany' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Statystyka W", "Wartość p"),
+  Wartość = c(test_h2$statistic, format.pval(test_h2$p.value, digits = 3))
+) %>%
+  kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h2' not found
+```
+
+``` r
+## (Wykres usunięty)
+```
+
+**Wyniki**
+Mediany poziomu uzależnienia według płci
+Grupa	Mediana	N
+Female	7	353
+Male	7	352
+
+Wyniki testu U Manna-Whitneya
+Statystyka	Wartość
+Statystyka W	66322.5
+Wartość p	0.113
+
+## 5.3 Hipoteza 3: Płeć a wybór platformy
+
+**Pytanie badawcze:** Czy istnieje zależność między płcią a preferowaną platformą społecznościową?
+
+**Hipotezy:**
+H_0: Płeć i wybór platformy są niezależne.
+H_1: Istnieje zależność między płcią a wyborem głównej platformy.
+
+Zastosowano test niezależności Chi-kwadrat ($\chi^2$).
+
+
+``` r
+# Test niezależności Chi-kwadrat
+tabela_kontyngencji <- table(dane_clean$f.Plec, dane_clean$f.Platforma)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+test_h3 <- chisq.test(tabela_kontyngencji)
+```
+
+```
+## Error:
+## ! object 'tabela_kontyngencji' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Chi-kwadrat", "df", "Wartość p"),
+  Wartość = c(round(test_h3$statistic, 2), 
+              test_h3$parameter,
+              format.pval(test_h3$p.value, digits = 3))
+) %>%
+  kbl(caption = "Wyniki testu niezależności Chi-kwadrat") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h3' not found
+```
+
+``` r
+## (Wykres usunięty)
+```
+
+**Wyniki**
+Wyniki testu niezależności Chi-kwadrat
+Statystyka	Wartość
+Chi-kwadrat	154.33
+df	11
+Wartość p	<2e-16
+
+## 5.4 Hipoteza 4: Poziom edukacji a uzależnienie
+
+**Pytanie badawcze:** Czy występują różnice w poziomie uzależnienia pomiędzy studentami na różnych etapach edukacji?
+
+**Hipotezy:**
+H_0: Rozkłady poziomu uzależnienia są takie same we wszystkich grupach edukacyjnych.
+H_1: Przynajmniej jedna grupa różni się poziomem uzależnienia od pozostałych.
+
+Zastosowano test Kruskala-Wallisa (nieparametryczny odpowiednik ANOVA).
+
+
+``` r
+# Test Kruskala-Wallisa
+test_h4 <- kruskal.test(Wynik_uzaleznienia ~ Poziom_akademicki, data = dane_clean)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Mediany w grupach
+mediany_edukacja <- dane_clean %>%
+  group_by(Poziom_akademicki) %>%
+  summarise(Mediana = median(Wynik_uzaleznienia),
+            N = n())
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+mediany_edukacja %>%
+  kbl(caption = "Mediany poziomu uzależnienia według poziomu akademickiego",
+      col.names = c("Poziom akademicki", "Mediana", "N")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'mediany_edukacja' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Chi-kwadrat", "df", "Wartość p"),
+  Wartość = c(round(test_h4$statistic, 2),
+              test_h4$parameter,
+              format.pval(test_h4$p.value, digits = 3))
+) %>%
+  kbl(caption = "Wyniki testu Kruskala-Wallisa") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h4' not found
+```
+
+``` r
+# Testy post-hoc (Dunn) jeśli wynik istotny
+if(test_h4$p.value < 0.05) {
+  posthoc_h4 <- dunnTest(Wynik_uzaleznienia ~ Poziom_akademicki, 
+                         data = dane_clean, method = "bonferroni")
+  posthoc_h4$res %>%
+    kbl(caption = "Testy post-hoc (Dunn) z korektą Bonferroniego", digits = 3) %>%
+    kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+}
+```
+
+```
+## Error:
+## ! object 'test_h4' not found
+```
+
+``` r
+  ## (Wykres usunięty)
+```
+
+**Wyniki**
+Mediany poziomu uzależnienia według poziomu akademickiego
+Poziom akademicki	Mediana	N
+Graduate	7	325
+High School	8	27
+Undergraduate	7	35
+
+Wyniki testu Kruskala-Wallisa
+Statystyka	Wartość
+Chi-kwadrat	39.1
+df	2
+Wartość p	3.23e-09
+
+
+Testy post-hoc (Dunn) z korektą Bonferroniego
+Comparison	Z	P.unadj	P.adj
+Graduate - High School	-6.183	0.000	0.000
+Graduate - Undergraduate	-2.155	0.031	0.094
+High School - Undergraduate	5.372	0.000	0.000
+
+## 5.5 Hipoteza 5: Deficyt snu a czas online
+
+**Pytanie badawcze:** Czy istnieje związek między czasem spędzanym w mediach społecznościowych a liczbą godzin snu?
+
+**Hipotezy:**
+H_0: Nie ma istotnej korelacji między czasem online a liczbą godzin snu.
+H_1: Istnieje istotna korelacja między czasem spędzanym online a czasem snu.
+
+Zastosowano współczynnik korelacji rang Spearmana.
+
+
+``` r
+# Test korelacji rang Spearmana
+test_h5 <- cor.test(dane_clean$Sredni_Czas_Użytkowania,
+                    dane_clean$Godziny_snu,
+                    method = "spearman")
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Rho Spearmana", "Wartość p", "N"),
+  Wartość = c(round(test_h5$estimate, 3),
+              format.pval(test_h5$p.value, digits = 3),
+              nrow(dane_clean))
+) %>%
+  kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h5' not found
+```
+
+``` r
+## (Wykres usunięty)
+```
+
+**Wyniki**
+Wyniki testu korelacji rang Spearmana
+Statystyka	Wartość
+Rho Spearmana	-0.814
+Wartość p	<2e-16
+N	705
+
+## 5.6 Hipoteza 6: Uzależnienie a wpływ na wyniki w nauce według wieku
+
+**Pytanie badawcze:** Czy osoby deklarujące negatywny wpływ mediów społecznościowych na wyniki w nauce mają wyższy poziom uzależnienia? Które grupy wiekowe są najbardziej zagrożone?
+
+**Hipotezy:**
+$H_0$: Poziom uzależnienia nie różni się między osobami deklarującymi i niedeklarującymi wpływu mediów na wyniki w nauce.
+$H_1$: Osoby deklarujące wpływ mediów na wyniki w nauce mają istotnie wyższy poziom uzależnienia.
+
+Zastosowano test U Manna-Whitneya oraz dodatkową analizę według grup wiekowych.
+
+
+``` r
+# Test U Manna-Whitneya
+test_h6 <- wilcox.test(Wynik_uzaleznienia ~ f.Wplyw_na_wyniki, data = dane_clean)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Mediany w grupach
+mediany_wplyw <- dane_clean %>%
+  group_by(f.Wplyw_na_wyniki) %>%
+  summarise(Mediana = median(Wynik_uzaleznienia),
+            Srednia = mean(Wynik_uzaleznienia),
+            N = n())
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+mediany_wplyw %>%
+  kbl(caption = "Poziom uzależnienia według deklarowanego wpływu na wyniki w nauce",
+      col.names = c("Wpływ na wyniki", "Mediana", "Średnia", "N"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'mediany_wplyw' not found
+```
+
+``` r
+tibble(
+  Statystyka = c("Statystyka W", "Wartość p"),
+  Wartość = c(test_h6$statistic, format.pval(test_h6$p.value, digits = 3))
+) %>%
+  kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'test_h6' not found
+```
+
+``` r
+## (Wykres usunięty)
+
+# Analiza według grup wiekowych
+dane_clean <- dane_clean %>%
+  mutate(Grupa_wiekowa = case_when(
+    Wiek <= 20 ~ "18-20 lat",
+    Wiek <= 23 ~ "21-23 lata",
+    TRUE ~ "24+ lat"
+  ))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+# Tabela krzyżowa: wiek x wpływ na wyniki
+tabela_wiek_wplyw <- dane_clean %>%
+  group_by(Grupa_wiekowa, f.Wplyw_na_wyniki) %>%
+  summarise(N = n(), .groups = "drop") %>%
+  group_by(Grupa_wiekowa) %>%
+  mutate(Procent = round(N / sum(N) * 100, 1)) %>%
+  filter(f.Wplyw_na_wyniki == "Yes") %>%
+  select(Grupa_wiekowa, N, Procent)
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+``` r
+tabela_wiek_wplyw %>%
+  kbl(caption = "Odsetek osób deklarujących negatywny wpływ mediów na naukę według wieku",
+      col.names = c("Grupa wiekowa", "Liczba osób (Yes)", "Procent grupy (%)")) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'tabela_wiek_wplyw' not found
+```
+
+``` r
+# Średnie uzależnienie w grupach wiekowych dla osób z wpływem
+dane_clean %>%
+  filter(f.Wplyw_na_wyniki == "Yes") %>%
+  group_by(Grupa_wiekowa) %>%
+  summarise(
+    Srednie_uzaleznienie = mean(Wynik_uzaleznienia),
+    Mediana = median(Wynik_uzaleznienia),
+    N = n()
+  ) %>%
+  kbl(caption = "Poziom uzależnienia wśród osób deklarujących wpływ na naukę - według wieku",
+      col.names = c("Grupa wiekowa", "Średnia", "Mediana", "N"),
+      digits = 2) %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
+```
+
+```
+## Error:
+## ! object 'dane_clean' not found
+```
+
+**Wyniki**
+Poziom uzależnienia według deklarowanego wpływu na wyniki w nauce
+Wpływ na wyniki	Mediana	Średnia	N
+No	5	4.60	252
+Yes	7	7.46	453
+
+
+Wyniki testu U Manna-Whitneya
+Statystyka	Wartość
+Statystyka W	360
+Wartość p	<2e-16
+
+Odsetek osób deklarujących negatywny wpływ mediów na naukę według wieku
+Grupa wiekowa	Liczba osób (Yes)	Procent grupy (%)
+18-20 lat	234	68.4
+21-23 lata	205	60.8
+24+ lat	14	53.8
+
+
+Poziom uzależnienia wśród osób deklarujących wpływ na naukę - według wieku
+Grupa wiekowa	Średnia	Mediana	N
+18-20 lat	7.58	8.0	234
+21-23 lata	7.31	7.0	205
+24+ lat	7.64	7.5	1
+
+# 6. Podsumowanie i Wnioski
+Przeprowadzenie analizy na ponad 700 studentów pozwoliło na zrozumienie 
+mechanizmów korzystania z mediów społecznościowych oraz ich wpływu na życie 
+studentów.
+Z analizy wynikają następujące wnioski:
+ - Występuje silna korelacja między czasem spędzonych w mediach 
+ społecznościowych a ich dobrostanem; Wykazano silną ujemną korelację rang 
+ Spearmana między czasem użytkowania a zdrowiem psychicznym. Im więcej czasu 
+ studenci spędzają w mediach tym niżej oceniają swoje zdrowie psychiczne.
+ - Zaobserwowano negatywny wpływ na wyniki w nauce przy dłuższym czasie 
+ korzystania z mediów społecznościowych.
+ - Wraz z postępem edukacji spada czas spędzony w mediach społecznościowych jak 
+ i wyniki uzależnienia.
+ - Nie zaobserwowano istotnej różnicy w poziomie uzależnienia w rozróżnieniu 
+ płci, jednak wypływa ona na wybór platformy, kobiety częściej wybierają 
+ Instagrama i Tiktoka, mężczyźni natomiast Facebooka i YouTube.
+ - Wykazano wzrost konfliktów wraz ze wzrostem poziomu uzależnienia.
+ Podsumuwując wyniki analizy można stwierdzić, że media społęcznościowe są dużym
+ wyzwaniem dla życia młodych dorosłych. Silnie wpływają na ich sen, zdrowie 
+ psychiczne jak i wyniki w nauce co też świadczy o wyzwaniu dla obecnej edukacji.
+
+
