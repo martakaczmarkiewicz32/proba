@@ -508,7 +508,7 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania)) +
 ```
 Histogram przedstawia rozkład średniego czasu spędzanego dziennie w mediach społecznościowych. Największa koncentracja obserwacji występuje w przedziale około 4–6 godzin dziennie. Maksimum krzywej gęstości znajduje się w okolicach 5 godzin.Rozkład wykazuje asymetrię prawostronną, co oznacza, że część użytkowników spędza w mediach społecznościowych znacznie więcej czasu niż przeciętnie. W prawej części rozkładu widoczny jest „ogon” obejmujący wartości powyżej 7–8 godzin dziennie, które mogą świadczyć o intensywnym korzystaniu z mediów społecznościowych przez niewielką grupę respondentów. Z kolei nieliczne obserwacje poniżej 2–3 godzin dziennie sugerują, że relatywnie mała część badanych korzysta z mediów społecznościowych w ograniczonym zakresie. Ogólny kształt rozkładu wskazuje na umiarkowane zróżnicowanie czasu użytkowania, przy dominacji średnich wartości i stopniowym spadku częstości wraz ze wzrostem liczby godzin. Podsumowując, wykres pokazuje, że większość respondentów spędza w mediach społecznościowych kilka godzin dziennie, natomiast skrajnie niskie i bardzo wysokie wartości występują rzadziej, co potwierdza istnienie zróżnicowanych, lecz wyraźnie skoncentrowanych wzorców użytkowania.
 
-#4.2 Poziom uzależnienia w zależności od platformy
+## 4.2 Poziom uzależnienia w zależności od platformy
 ```{r poziom-uzaleznienia-platforma}
 ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platforma)) +
   geom_boxplot(alpha = 0.7, outlier.colour = "red", outlier.shape = 1) +
@@ -521,7 +521,7 @@ ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platfor
 ```
 Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
 
-#4.3 Czas użytkowania a zdrowie psychiczne
+## 4.3 Czas użytkowania a zdrowie psychiczne
 ```{r czas-korzystania-a-zdrowie}
 ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychicznego)) +
   geom_jitter(color = "darkgreen", alpha = 0.4, width = 0.2) + 
@@ -534,7 +534,7 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychiczn
 
 Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
 
-#4.4 Wybór platformy z podziałem na płeć
+## 4.4 Wybór platformy z podziałem na płeć
 ```{r wybór-platformy-a-płeć}
 ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
   geom_bar(position = "dodge", color = "black", alpha = 0.8) +
@@ -577,17 +577,7 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
-ggscatterstats(
-  data = dane_clean, 
-  x = Sredni_Czas_Użytkowania,
-  y = Ocena_zdrowia_psychicznego,
-  type = "nonparametric",
-  xlab = "Średni czas użytkowania (h/dzień)",
-  ylab = "Ocena zdrowia psychicznego",
-  title = "Korelacja: Czas online vs Zdrowie psychiczne",
-  messages = FALSE
-)
+## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -631,19 +621,7 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
-ggbetweenstats(
-  data = dane_clean,
-  x = f.Plec,
-  y = Wynik_uzaleznienia,
-  type = "nonparametric",
-  plot.type = "box",
-  xlab = "Płeć",
-  ylab = "Poziom uzależnienia",
-  title = "Różnice w poziomie uzależnienia ze względu na płeć",
-  pairwise.comparisons = TRUE,
-  messages = FALSE
-)
+## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -680,15 +658,7 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu niezależności Chi-kwadrat") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
-ggbarstats(
-  data = dane_clean,
-  x = f.Platforma,
-  y = f.Plec,
-  title = "Preferencje wyboru platformy w zależności od płci",
-  label = "both",
-  messages = FALSE
-)
+## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -741,17 +711,7 @@ if(test_h4$p.value < 0.05) {
     kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 }
 
-ggbetweenstats(
-  data = dane_clean,
-  x = Poziom_akademicki,
-  y = Wynik_uzaleznienia,
-  type = "nonparametric",
-  xlab = "Poziom akademicki",
-  ylab = "Poziom uzależnienia",
-  title = "Poziom uzależnienia a etap studiów",
-  p.adjust.method = "bonferroni",
-  messages = FALSE
-)
+  ## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -798,17 +758,7 @@ tibble(
 ) %>%
   kbl(caption = "Wyniki testu korelacji rang Spearmana") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
-
-ggscatterstats(
-  data = dane_clean,
-  x = Sredni_Czas_Użytkowania,
-  y = Godziny_snu,
-  type = "nonparametric",
-  xlab = "Średni czas użytkowania (h/dzień)",
-  ylab = "Godziny snu na noc",
-  title = "Związek między czasem online a jakością snu",
-  messages = FALSE
-)
+## (Wykres usunięty)
 ```
 
 **Wyniki**
@@ -852,17 +802,7 @@ tibble(
   kbl(caption = "Wyniki testu U Manna-Whitneya") %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 
-ggbetweenstats(
-  data = dane_clean,
-  x = f.Wplyw_na_wyniki,
-  y = Wynik_uzaleznienia,
-  type = "nonparametric",
-  plot.type = "box",
-  xlab = "Deklarowany wpływ na wyniki w nauce",
-  ylab = "Poziom uzależnienia",
-  title = "Poziom uzależnienia a wpływ mediów na wyniki w nauce",
-  messages = FALSE
-)
+## (Wykres usunięty)
 
 # Analiza według grup wiekowych
 dane_clean <- dane_clean %>%
