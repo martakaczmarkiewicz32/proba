@@ -310,6 +310,8 @@ descr(dane$Avg_Daily_Usage_Hours)
 ggdensity(dane, x = "Avg_Daily_Usage_Hours", fill = "orange", alpha = 0.4) +
    labs(title = "Gęstość rozkładu dziennego czasu użytkowania", x = "Godziny na dobę")
 ``` 
+
+
 Średnia długość użytkowania wynosi 4,92, a odchylenie standardowe 1,26. Połowa studentów spędza czas w mediach społecznościowych od 4,1 do 5,8 godziny dziennie.
 
 ### 3.2.2 Rozkład czasu według kategorii
@@ -456,7 +458,7 @@ stats_snu <- dane_clean %>%
       digits = 2) %>%
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 
-print(stats_snu)
+stats_snu
 ```
 Średnia długość snu wynosi 6,87 godzin, jednak aż 50% wykazuje deficyt snu , czyli poniżej 7 godzin.
 
@@ -544,6 +546,8 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania)) +
   theme_minimal()
 
 ```
+
+
 Histogram przedstawia rozkład średniego czasu spędzanego dziennie w mediach społecznościowych. Największa koncentracja obserwacji występuje w przedziale około 4–6 godzin dziennie. Maksimum krzywej gęstości znajduje się w okolicach 5 godzin.Rozkład wykazuje asymetrię prawostronną, co oznacza, że część użytkowników spędza w mediach społecznościowych znacznie więcej czasu niż przeciętnie. W prawej części rozkładu widoczny jest „ogon” obejmujący wartości powyżej 7–8 godzin dziennie, które mogą świadczyć o intensywnym korzystaniu z mediów społecznościowych przez niewielką grupę respondentów. Z kolei nieliczne obserwacje poniżej 2–3 godzin dziennie sugerują, że relatywnie mała część badanych korzysta z mediów społecznościowych w ograniczonym zakresie. Ogólny kształt rozkładu wskazuje na umiarkowane zróżnicowanie czasu użytkowania, przy dominacji średnich wartości i stopniowym spadku częstości wraz ze wzrostem liczby godzin. Podsumowując, wykres pokazuje, że większość respondentów spędza w mediach społecznościowych kilka godzin dziennie, natomiast skrajnie niskie i bardzo wysokie wartości występują rzadziej, co potwierdza istnienie zróżnicowanych, lecz wyraźnie skoncentrowanych wzorców użytkowania.
 
 ## 4.2 Poziom uzależnienia w zależności od platformy
@@ -557,6 +561,8 @@ ggplot(dane_clean, aes(x = f.Platforma, y = Wynik_uzaleznienia, fill = f.Platfor
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 ```
+
+
 Na wykresie można zauważyć poziom uzależnienia od mediów społecznościowych w zależności od najczęściej używanej platformy. Widoczne są duże różnice pomiędzy poszczególnymi aplikacjami, zarówno pod względem mediany wyników oraz ich zróżnicowania. Najwyższe wartości uzależnienia obserwowane są wśród użytkowników takich platform jak WhatsApp, Instagram, Snapchat oraz TikTok, co może wskazywać na ich bardziej angażujący charakter oraz częstsze korzystanie w ciągu dnia.Dla niektórych platform, takich jak LINE, KakaoTalk czy VKontakte, liczba obserwacji jest niewielka. Widoczne są również pojedyncze obserwacje odstające, m.in. dla LinkedIn oraz TikTok, które mogą wynikać ze specyficznych nawyków użytkowników tych platform. Wykres pokazuje, że poziom uzależnienia nie jest jednorodny i w dużym stopniu zależy od rodzaju wykorzystywanej platformy
 
 ## 4.3 Czas użytkowania a zdrowie psychiczne
@@ -569,6 +575,7 @@ ggplot(dane_clean, aes(x = Sredni_Czas_Użytkowania, y = Ocena_zdrowia_psychiczn
        y = "Ocena zdrowia psychicznego (1-10)") +
   theme_minimal()
 ```
+
 
 Na wykresie  widoczna jest wyraźna zależność ujemna pomiędzy czasem spędzanym w mediach społecznościowych a oceną zdrowia psychicznego. Wraz ze wzrostem liczby godzin spędzanych online, średnia samoocena zdrowia psychicznego wyraźnie się obniża, co potwierdza nachylenie linii trendu. Punkty są dość rozproszone, co wskazuje, że zależność nie jest idealna i mogą na nią wpływać także inne czynniki.Osoby spędzające więcej czasu w mediach społecznościowych częściej deklarują niższy poziom dobrostanu psychicznego.
 
@@ -584,6 +591,8 @@ ggplot(dane_clean, aes(x = f.Platforma, fill = f.Plec)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+
 Wykres przedstawia wybór najczęściej używanej platformy społecznościowej z podziałem na płeć. Widoczne są wyraźne różnice pomiędzy kobietami i mężczyznami w preferencjach dotyczących poszczególnych aplikacji. Wśród kobiet zdecydowanie dominuje Instagram. Wysoką popularnością cieszy się również TikTok. W przypadku mężczyzn zdecydowanie częściej wybierane są Facebook oraz YouTube. Dla obu płci Instagram i TikTok należą do najpopularniejszych platform, jednak liczba użytkowniczek tych serwisów jest wyraźnie większa niż liczba użytkowników. Pozostałe platformy, takie jak Snapchat, Twitter czy LinkedIn, są wybierane znacznie rzadziej i nie wykazują dużych różnic między płciami.
 
 # 5. Wnioskowanie statystyczne
@@ -596,7 +605,11 @@ Ze względu na znaczną liczebność próby (N=705) oraz wyniki testów (p < 0.0
 **Pytanie badawcze:** Czy istnieje związek pomiędzy ilością czasu spędzanego w mediach społecznościowych a subiektywną oceną zdrowia psychicznego?
 
 **Hipotezy:**
+
+
 H_0: Nie ma istotnej korelacji między czasem spędzanym w mediach a oceną zdrowia psychicznego.
+
+
 H_1: Istnieje istotna statystycznie korelacja między tymi zmiennymi.
 
 Do weryfikacji wykorzystano współczynnik korelacji rang Spearmana.
@@ -626,7 +639,11 @@ Współczynnik korelacji rang Spearmana wynosi -0,802, co wskazuje na silną uje
 **Pytanie badawcze:** Czy płeć różnicuje poziom uzależnienia od mediów społecznościowych?
 
 **Hipotezy:**
+
+
 H_0: Nie ma istotnych różnic w poziomie uzależnienia między kobietami a mężczyznami.
+
+
 H_1: Występują istotne różnice w poziomie uzależnienia między kobietami a mężczyznami. 
 
 Zastosowano test U Manna-Whitneya (Wilcoxona dla dwóch prób niezależnych).
@@ -657,15 +674,20 @@ tibble(
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
+
 **Wnioski**
-Wartość p jest wyższa niż próg 0,05, oznacza to, że mamy brak podstaw do odrzucenia hipotezy zerowej. Różnica w poziomie uzależnienia między kobietami a mężczyznami nie jest istotna statystycznie. Wynik ten pokazuje, że płeć nie jest czynnikiem różniującym skłonność do uzależnienia od mediów społecznościowych.
+Wartość p jest wyższa niż próg 0,05, oznacza to, że mamy brak podstaw do odrzucenia hipotezy zerowej. Różnica w poziomie uzależnienia między kobietami a mężczyznami nie jest istotna statystycznie. Wynik ten pokazuje, że płeć nie jest czynnikiem różniującym skłonność do uzależnienia od mediów społecznościowych. Jak również w pierwszej tabeli pokazano, że mediana jest taka sama.
 
 ## 5.3 Hipoteza 3: Płeć a wybór platformy
 
 **Pytanie badawcze:** Czy istnieje zależność między płcią a preferowaną platformą społecznościową?
 
 **Hipotezy:**
+
+
 H_0: Płeć i wybór platformy są niezależne.
+
+
 H_1: Istnieje zależność między płcią a wyborem głównej platformy.
 
 Zastosowano test niezależności Chi-kwadrat ($\chi^2$).
@@ -685,12 +707,21 @@ tibble(
   kable_styling(full_width = F, bootstrap_options = c("striped", "hover"))
 ```
 
+
+**Wnioski**
+Wartość p jest niższa od progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej, istnieje zależność między płcią a wyborem platfomy.
+
+
 ## 5.4 Hipoteza 4: Poziom edukacji a uzależnienie
 
 **Pytanie badawcze:** Czy występują różnice w poziomie uzależnienia pomiędzy studentami na różnych etapach edukacji?
 
 **Hipotezy:**
+
+
 H_0: Rozkłady poziomu uzależnienia są takie same we wszystkich grupach edukacyjnych.
+
+
 H_1: Przynajmniej jedna grupa różni się poziomem uzależnienia od pozostałych.
 
 Zastosowano test Kruskala-Wallisa (nieparametryczny odpowiednik ANOVA).
@@ -731,14 +762,18 @@ if(test_h4$p.value < 0.05) {
 ```
 
 **Wnioski**
-Wartość p jest niższa od progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje zależność między płcią a wyborem dominującej platformy społecznościowej. Można zauważyć, że kobiety wybierają częściej platformy skupiające się na treściach wizualnych, a mężczyźni preferują platformy o charakterze informacyjnym.
+Wartość p jest niższa od progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej. Istnieje zależność między płcią a wyborem dominującej platformy społecznościowej. Można zauważyć, że kobiety wybierają częściej platformy skupiające się na treściach wizualnych, a mężczyźni preferują platformy o charakterze informacyjnym. Test wykazuje, że w większości studenci na różnych etapach edukacji wykazują różnice w poziomie uzależnienia. 
 
 ## 5.5 Hipoteza 5: Deficyt snu a czas online
 
 **Pytanie badawcze:** Czy istnieje związek między czasem spędzanym w mediach społecznościowych a liczbą godzin snu?
 
 **Hipotezy:**
+
+
 H_0: Nie ma istotnej korelacji między czasem online a liczbą godzin snu.
+
+
 H_1: Istnieje istotna korelacja między czasem spędzanym online a czasem snu.
 
 Zastosowano współczynnik korelacji rang Spearmana.
@@ -767,7 +802,11 @@ Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy
 **Pytanie badawcze:** Czy osoby deklarujące negatywny wpływ mediów społecznościowych na wyniki w nauce mają wyższy poziom uzależnienia? Które grupy wiekowe są najbardziej zagrożone?
 
 **Hipotezy:**
+
+
 $H_0$: Poziom uzależnienia nie różni się między osobami deklarującymi i niedeklarującymi wpływu mediów na wyniki w nauce.
+
+
 $H_1$: Osoby deklarujące wpływ mediów na wyniki w nauce mają istotnie wyższy poziom uzależnienia.
 
 Zastosowano test U Manna-Whitneya oraz dodatkową analizę według grup wiekowych.
@@ -834,15 +873,15 @@ dane_clean %>%
 ```
 
 **Wnioski**
-Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej, istnieje statystycznie istotna różnica poziomu uzależnienia między osobami, które deklarują negatywny wpływ mediów społecznościowych w nauce, a tymi, które go nie zauważają. Można także zauważyć, że najbardziej narażoną grupą są najmłodsi studenci.
+Wartość p jest znacznie poniżej progu 0,05, co pozwala na odrzucenie hipotezy zerowej na rzecz hipotezy alternatywnej, istnieje statystycznie istotna różnica poziomu uzależnienia między osobami, które deklarują negatywny wpływ mediów społecznościowych w nauce, a tymi, które go nie zauważają. Można także zauważyć, że najbardziej narażoną grupą są najmłodsi studenci jak i fakt, że grupa, która uważa, że miedia społecznościowe wpływają na ich wyniki w nauce jest prawie dwa razy większa niż grupa, w której uważają odwrotnie.
 
 # 6. Podsumowanie i Wnioski
 Przeprowadzenie analizy na ponad 700 studentów pozwoliło na zrozumienie 
 mechanizmów korzystania z mediów społecznościowych oraz ich wpływu na życie 
-studentów.
+studentów. Zostały przebadane różne czynniki, które wpływają na dobrostan studentów, m.in.: czas spędzony w mediach społecznościowych czy konflikty.
 
 
-Z analizy wynikają następujące wnioski:
+Zgodnie z celem projektu zostały przeprowadzone analizy, z których wynikają następujące wnioski:
 
 - Badana grupa jest zróżnicowana pod względem pochodzenia, najlczniejsza grupa pochodzi z Indii i USA
 
